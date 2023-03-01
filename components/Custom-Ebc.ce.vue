@@ -1,7 +1,7 @@
 <template>
   <section class="stage">
     <div class="container-xl stage__container">
-      <h2 class="my-4">{{ translate('title') }}</h2>
+      <h2 class="my-4" :style="{'color': primaryColor}">{{ translate('title') }}</h2>
       <p class="card-text">{{ translate('text') }}</p>
       <div class="row">{{ user }} - {{ receivedData }}</div>
     </div>
