@@ -6,7 +6,7 @@ export const useFetch = async (url, method, data = undefined) => {
       method,
       body: JSON.stringify(data),
       headers: {
-        "Content-type": "application/json",
+        "Content-type": "html",
       },
     });
     //console.log('success', response);

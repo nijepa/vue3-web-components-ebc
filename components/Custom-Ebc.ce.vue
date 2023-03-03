@@ -131,7 +131,7 @@
                   </svg>
                 </button>
               </div>
-              <form id="address-form" @submit="saveAddress">
+              <form id="address-form" @submit.prevent="saveAddress">
                 <div class="row my-3">
                   <div class="col-12 col-lg-4 font-weight-bold">
                     {{ translate('email') }}
@@ -157,6 +157,7 @@
                       id="additionalDeliveryEmailAddress"
                       class="additional-email address-data form-control "
                       type="email"
+                      v-model="altEmail"
                       required
                     />
                     <button
@@ -222,6 +223,7 @@ const translate = (key) => {
 
 // fetch availabile vouchers
 const receivedData = ref([]);
+const altEmail = ref(null)
 const getData = async () => {
   const received = await useFetch(props.emailUrl, 'POST', {
     action: 'load_data',
@@ -242,13 +244,21 @@ const togglePass = () => {
   isEmail.value = false
   isPass.value = !isPass.value
 }
-const toggleEmail = () => {
+const toggleEmail = async () => {
   isPass.value = false
   isEmail.value = !isEmail.value
+  if(isEmail.value) {
+    await useFetch(props.emailUrl, 'POST', {
+    action: 'edit',
+  });
+  }
 }
 
-const saveAddressAction = () => {
-
+const saveAddress = async () => {
+  await useFetch(props.emailUrl, 'POST', {
+    action: 'save',
+    additionalDeliveryEmailAddress: altEmail.value
+  });
 }
 // // setting component state
 // const active = ref(false);
