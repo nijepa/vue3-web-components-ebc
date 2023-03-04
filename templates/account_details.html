@@ -1,0 +1,402 @@
+##
+## Page Info
+#####################
+#set( $template_name = "account_details" )
+#set( $templateSwitch = "account_details" ) 
+## 
+## General 
+#####################
+#set( $username = $session.getAttribute($constants.get('SESSION_KEY_REMOTE_USER')))
+
+<section class="stage">
+  <div class="container-xl stage__container">
+    <h2 class="my-4">$!{messages.get('shop.ebc.my_account')}</h2>
+    <p class="card-text">
+      $messages.get('shop.ebc.my_account.text')
+    </p>
+    <div class="row">
+      <div class="col-sm-12 col-md-6 mb-3">
+        <div class="card stage__card voucher-overview">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <h4 class="overview-title" onclick="toggleEdit('account', event)">$!{messages.get('shop.ebc.my_account.access-data')}</h4>
+              <button onclick="toggleEdit('account', event)" class="edit-btn p-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                  <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                </svg>
+              </button>
+            </div>
+            <form id="password-form" onsubmit="savePasswordAction(event)">
+              <div class="row my-3">
+                <div class="col-12 col-lg-4 font-weight-bold">
+                  $!{messages.get('shop.ebc.my_account.user-name')}
+                </div>
+                <div class="col-12 col-lg-8">
+                  $username
+                </div>
+              </div>
+              <div class="row my-3">
+                <div class="col-12 col-lg-4 font-weight-bold">
+                  $!{messages.get('shop.ebc.my_account.password')}
+                </div>
+                <div class="col-12 col-lg-8">
+                  <span id="ebc-password" class="account-data">
+                    *********
+                  </span>
+                  <input id="oldPassword" name="oldPassword" class="account-data form-control d-none mb-3" required minlength="9" type="password" placeholder="$!{messages.get('shop.ebc.my_account.old_password')}">
+                  <p class="text-danger oldPassword" hidden ></p>
+                  <input id="newPassword" name="newPassword" class="account-data form-control d-none mb-3" required minlength="9" type="password" placeholder="$!{messages.get('shop.ebc.my_account.new_password')}">
+                  <p class="text-danger newPassword" hidden></p>
+                  <input id="newPasswordRetype" name="newPasswordRetype" class="account-data form-control d-none mb-3" required minlength="9" type="password" placeholder="$!{messages.get('shop.ebc.my_account.repeat_new_password')}">
+                  <p class="text-danger newPasswordRetype" hidden></p>
+                  <button id="submit-changed-password" class="btn btn-primary account-data d-none mb-3 disabled" disabled type="submit">$!{messages.get('shop.ebc.my_account.save_changes')}</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-12 col-md-6 mb-3">
+        <div class="card stage__card voucher-overview">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <h4 class="overview-title">$!{messages.get('shop.ebc.my_account.delivery-address')}</h4>
+              <button onclick="toggleEdit('address', event)" class="edit-btn p-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                  <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                </svg>
+              </button>
+            </div>
+            <form id="address-form" onsubmit="saveAddressAction(event)">
+              <div class="row my-3">
+                <div class="col-12 col-lg-4 font-weight-bold">
+                  $!{messages.get('shop.ebc.my_account.email')}
+                </div>
+                <div class="col-12 col-lg-8">
+                  <span id="deliveryAddress">
+                    ## Delivery address goes here
+                  </span>
+                </div>
+                <div class="col-12 col-lg-4 font-weight-bold mt-4 additional-email" style="display: none;">
+                  $!{messages.get('shop.ebc.my_account.alternative_email')}
+                </div>
+                <div class="col-12 col-lg-8 mt-4 additional-email-data">
+                  <span id="additionalDeliveryAddress" class="address-data">
+                    ## Delivery address goes here
+                  </span>
+                  <input id="additionalDeliveryEmailAddress" class="additional-email address-data form-control d-none" type="email" required>
+                  <button id="submit-address" class="btn btn-primary mt-3 address-data d-none disabled" disabled type="submit">$!{messages.get('shop.ebc.my_account.send_to_alternative_email')}</button>
+                  <button id="delete-address" onclick="deleteAddressAction(event)" class="btn btn-outline product-btn mt-3 address-data d-none disabled" disabled type="submit">$!{messages.get('shop.ebc.my_account.delete_alternative_email')}</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <custom-toast is-active toast-data toast-style></custom-toast>
+</section>
+
+<script async defer>
+const ebc = document.querySelector("custom-ebc");
+
+function setAttributes(el, attrs) {
+  for (var key in attrs) {
+    const attr =
+      typeof attrs[key] !== "string"
+        ? JSON.stringify(attrs[key])
+        : attrs[key];
+    el.setAttribute(key, attr);
+  }
+}
+const ebcProps = {
+  translations: {
+    #foreach($resource in ${messages.getResourcesWithPrefix('shop.ebc.my_account')})
+      '$!{resource.getKey()}': '$!{resource.getValue().replace("'", "")}',
+    #end
+  },
+  "primary-color": getComputedStyle(document.querySelector('.site-title')).color,
+  font: getComputedStyle(document.querySelector('.site-title')).fontFamily,
+      };
+  setAttributes(ebc, ebcProps);
+</script>
+
+<script>
+// vue3 web component toast handling
+const toast = document.querySelector("custom-toast");
+const td = {}
+const ts = { position: "center", decoration: false, colorized: false, backdrop: false };
+toast.setAttribute("toast-style", JSON.stringify(ts));
+function showToast(msg, error = false) {
+  td.message = JSON.parse(JSON.stringify(msg))
+  if(error) {
+    const err = "$!{messages.get('shop.ebc.messages.error')}"
+    td.title = err
+    td.type = "error"
+  } else {
+    const suc = "$!{messages.get('shop.ebc.messages.success')}"
+    td.title = suc
+    td.type = "success"
+  } 
+  toast.setAttribute("toast-data", JSON.stringify(td));
+  toast.setAttribute("is-active", "true");
+}
+window.addEventListener("close-toast", toastClosed);
+function toastClosed() {
+  toast.setAttribute("is-active", "false");
+}
+
+// handling forms
+let accountEditable = false;
+let addressEditable = false;
+let hasAltEmail = false
+
+function toggleEdit(field, event){
+  jQuery(".edit-btn").removeClass("active")
+  !hasAltEmail && jQuery(".additional-email").hide()
+  if(field == "account"){
+    accountEditable = !accountEditable;
+    if (addressEditable){
+      jQuery(".address-data").toggleClass("d-none");
+    }
+    if (accountEditable){
+      event.currentTarget.classList.add("active")
+      callPasswordEditAction()
+    }
+    jQuery(".account-data").toggleClass("d-none");
+    addressEditable = false;
+  } else if (field == "address") {
+    clearErrors(true);
+    addressEditable = !addressEditable;
+    jQuery('#submit-address').show()
+    if (accountEditable){
+      jQuery(".account-data").toggleClass("d-none");
+    }
+    if (addressEditable){
+      jQuery(".additional-email").show()
+      event.currentTarget.classList.add("active")
+      callAddressEditAction()
+    }
+    jQuery(".address-data").toggleClass("d-none");
+    accountEditable = false;
+  }
+}
+
+function hideView(view){
+  if(view == "account"){
+    jQuery(".account-data").toggleClass("d-none");
+  }
+  if(view == "address"){
+    jQuery(".address-data").toggleClass("d-none");
+  }
+  jQuery(".edit-btn.active").removeClass("active")
+  addressEditable = false
+  accountEditable = false   
+}
+
+// handling ajax call errors
+const handleErrors = (errors, type = false) => {
+  let generalError = errors.error.find(e => e.errorType === 'error').errorMessage
+  const fieldErrors = errors.error.filter(e => e.errorType === 'FieldError')
+  if (generalError) {
+    if (type) {
+      generalError = `<div class="">
+                      $!{messages.get('errors.shop.ebc.profile.delivery_address.invalid')}
+                    </div>`
+    } else {
+      generalError = `<div class="">
+                      $!{messages.get('errors.shop.ebc.profile.credential.password.invalid')}
+                    </div>`
+    }
+    fieldErrors.length || showToast(generalError, true)
+  }
+  
+  if (fieldErrors.length) {
+    fieldErrors.forEach(f => {
+      let elem = document.querySelector(`.${f.errorField}`)
+      elem.removeAttribute("hidden")
+      elem.innerHTML = f.errorMessage
+      jQuery(`#${f.errorField}`).addClass("is-invalid")
+    }); 
+  }
+  clearErrors()
+}
+
+const clearErrors = (type = false) => {
+  const inputs = document.querySelectorAll(".account-data");
+  inputs.forEach(i => i.addEventListener("focus", () => {
+    i.classList.remove("is-invalid")
+    let errorField = document.querySelector(`.${i.id}`)
+    if (errorField) errorField.setAttribute("hidden", "")
+  }))
+  if (type) {
+    inputs.forEach(i => {
+      i.classList.remove("is-invalid")
+      let errorField = document.querySelector(`.${i.id}`)
+      if (errorField) errorField.setAttribute("hidden", "")
+    })
+  }
+}
+
+// handling ajax calls
+let errorMessages = null
+function getDeliveryAddress() {
+  jQuery.ajax({
+    method : "POST",
+    url: "${link.getAction('/ajax/taxfreenoncashbenefit/email')}",
+    data : { action: "load_data" },
+    dataType : "html",
+    success: function(data) {
+      jQuery('#deliveryAddress').html(JSON.parse(data).deliveryAddress);
+      if(JSON.parse(data).additionalDeliveryAddress) {
+        hasAltEmail = true
+        jQuery('.additional-email').show()
+        jQuery('#additionalDeliveryAddress').html(JSON.parse(data).additionalDeliveryAddress) 
+        jQuery('#additionalDeliveryEmailAddress').attr("placeholder", JSON.parse(data).additionalDeliveryAddress) 
+        jQuery('#delete-address').show()
+      } else {
+        jQuery('.additional-email').hide() 
+        jQuery('#delete-address').hide()
+      }                   
+    },
+    error: function (er) {
+      showToast(er, true)
+    }
+  });
+}
+getDeliveryAddress();
+
+function callPasswordEditAction(){
+  jQuery.ajax({
+    method : "POST",
+    url: "${link.getAction('/ajax/taxfreenoncashbenefit/credential')}",
+    data : { action: "edit" },
+    dataType : "html",
+    success: function(data) {
+      jQuery("#submit-changed-password").removeClass("disabled");
+      jQuery("#submit-changed-password").removeAttr("disabled");                    
+    },
+    error: function (er) {
+      showToast(er, true)
+    }
+  });
+}
+
+function savePasswordAction(event){
+  event.preventDefault()
+  jQuery.ajax({
+    method : "POST",
+    url: "${link.getAction('/ajax/taxfreenoncashbenefit/credential')}",
+    data: { 
+      action: "save", 
+      oldPassword: document.getElementById("oldPassword").value, 
+      newPassword: document.getElementById("newPassword").value, 
+      newPasswordRetype: document.getElementById("newPasswordRetype").value
+    },
+    dataType: "html",
+    success: function(data) {
+      jQuery("#submit-changed-password").addClass("disabled");
+      jQuery("#submit-password-changed").prop("disabled", true);
+      //hideView("account");
+      if (JSON.parse(data).success) {
+        hideView("account");
+        const msg = `<div class="">
+                      $!{messages.get('shop.ebc.my_account.save.success')}
+                    </div>`
+        showToast(msg)
+        document.getElementById("password-form").reset()
+      }
+      else {
+        errorMessages = JSON.parse(data)
+        handleErrors(errorMessages)
+        callPasswordEditAction()
+      }
+    },
+    error: function (er) {
+      showToast(er, true)
+      document.getElementById("password-form").reset()
+    }
+  });
+  //document.getElementById("password-form").reset()
+}
+
+function callAddressEditAction(){
+  jQuery.ajax({
+    method : "POST",
+    url: "${link.getAction('/ajax/taxfreenoncashbenefit/email')}",
+    data : { action: "edit" },
+    dataType : "html",
+    success: function(data) {
+      jQuery("#submit-address").removeClass("disabled");
+      jQuery("#submit-address").removeAttr("disabled"); 
+      jQuery("#delete-address").removeClass("disabled");
+      jQuery("#delete-address").removeAttr("disabled");
+    },
+    error: function (er) {
+      showToast(er, true)
+    }
+  });
+}
+
+function saveAddressAction(event){
+  event.preventDefault()
+  jQuery.ajax({
+    method : "POST",
+    url: "${link.getAction('/ajax/taxfreenoncashbenefit/email')}",
+    data: {
+      action: 'save',
+      additionalDeliveryEmailAddress: document.getElementById("additionalDeliveryEmailAddress").value
+    },
+    dataType: "html",
+    success: function(data){
+      jQuery("#additionalDeliveryAddress").html(JSON.parse(data).additionalDeliveryAddress)
+      jQuery("#submit-address").addClass("disabled");
+      jQuery("#submit-address").prop("disabled", true);
+      hideView("address");
+      if (JSON.parse(data).success) {
+        const msg = `<div class="">
+                      $!{messages.get('shop.ebc.my_account.save.success')}
+                    </div>`
+        showToast(msg)
+        getDeliveryAddress()
+      }
+      else {
+        errorMessages = JSON.parse(data)
+        handleErrors(errorMessages, true)
+        getDeliveryAddress()
+      }
+    },
+    error: function(er){
+      showToast(er, true)
+    }
+  });
+  document.getElementById("address-form").reset()
+}
+
+function deleteAddressAction(event){
+  event.preventDefault()
+  jQuery.ajax({
+    method : "POST",
+    url: "${link.getAction('/ajax/taxfreenoncashbenefit/email')}",
+    data: { action: 'delete'},
+    success: function(data) {
+      const msg = `<div class="">
+                      $!{messages.get('shop.ebc.my_account.delete.success')}
+                    </div>`
+      data.success && showToast(msg)
+      jQuery('#submit-address').hide()
+      jQuery('#additionalDeliveryAddress').html("") 
+      jQuery('#additionalDeliveryEmailAddress').attr("placeholder", "") 
+      hasAltEmail = false
+      getDeliveryAddress()                   
+    },
+    error: function (er) {
+      showToast(er, true)
+    }
+  })
+  document.getElementById("address-form").reset()
+}
+</script>

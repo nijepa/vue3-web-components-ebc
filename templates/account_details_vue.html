@@ -1,0 +1,29 @@
+#set( $username = $session.getAttribute($constants.get('SESSION_KEY_REMOTE_USER')))
+<h2 class="site-title" hidden>$username</h2>
+<custom-ebc></custom-ebc>
+<script async defer>
+const ebc = document.querySelector("custom-ebc");
+
+function setAttributes(el, attrs) {
+  for (var key in attrs) {
+    const attr =
+      typeof attrs[key] !== "string"
+        ? JSON.stringify(attrs[key])
+        : attrs[key];
+    el.setAttribute(key, attr);
+  }
+}
+const ebcProps = {
+  translations: {
+    #foreach($resource in ${messages.getResourcesWithPrefix('shop.ebc.my_account')})
+      '$!{resource.getKey()}': '$!{resource.getValue().replace("'", "")}',
+    #end
+  },
+  user: document.querySelector('.site-title').innerText,
+  "primary-color": getComputedStyle(document.querySelector('.site-title')).color,
+  font: getComputedStyle(document.querySelector('.site-title')).fontFamily,
+  "email-url": "${link.getAction('/ajax/taxfreenoncashbenefit/email')}",
+  "credential-url": "${link.getAction('/ajax/taxfreenoncashbenefit/credential')}"
+};
+setAttributes(ebc, ebcProps);
+</script>

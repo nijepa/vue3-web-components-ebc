@@ -1,0 +1,186 @@
+#set( $website = $torque.getWebsite($session.getAttribute($constants.get("SESSION_KEY_WEBSITE_ID"))) )
+#set( $scriptVersion = "1.0" )
+#set( $debugMode = false)
+#set( $login = "$!session.getAttribute($constants.get('SESSION_KEY_REMOTE_USER'))" != "")
+<!DOCTYPE html>
+<html lang="$!{locale.toLanguageTag()}">
+  <head>
+    #if($page_title)
+      #set($pagetitle = $page_title)
+    #elseif($site_layout.WEBSITE_DEFAULT_PAGETITLE)
+      #set($pagetitle = $site_layout.WEBSITE_DEFAULT_PAGETITLE)
+    #else
+      #set($pagetitle = "cadooz – rewarding excellence")
+    #end
+    <title>$!pagetitle</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="robots" content="noindex,nofollow"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes"/>
+    $!meta_data
+    
+    #if($!link.getTemplate("$site_layout.WEBSITE_STYLESHEET") != "" )
+      <style>body{opacity:0}</style> ## Prevent FOUC
+    #end
+    <link rel="apple-touch-icon" href="/images/shop/redemption/d16/icons/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" href="/images/shop/redemption/d16/icons/apple-touch-icon-57x57.png" sizes="57x57"/>
+    <link rel="apple-touch-icon" href="/images/shop/redemption/d16/icons/apple-touch-icon-60x60.png" sizes="60x60"/>
+    <link rel="apple-touch-icon" href="/images/shop/redemption/d16/icons/apple-touch-icon-72x72.png" sizes="72x72"/>
+    <link rel="apple-touch-icon" href="/images/shop/redemption/d16/icons/apple-touch-icon-76x76.png" sizes="76x76"/>
+    <link rel="apple-touch-icon" href="/images/shop/redemption/d16/icons/apple-touch-icon-114x114.png" sizes="114x114"/>
+    <link rel="apple-touch-icon" href="/images/shop/redemption/d16/icons/apple-touch-icon-120x120.png" sizes="120x120"/>
+    <link rel="apple-touch-icon" href="/images/shop/redemption/d16/icons/apple-touch-icon-128x128.png" sizes="128x128"/>
+    <link rel="apple-touch-icon" href="/images/shop/redemption/d16/icons/apple-touch-icon-144x144.png" sizes="144x144"/>
+    <link rel="apple-touch-icon" href="/images/shop/redemption/d16/icons/apple-touch-icon-152x152.png" sizes="152x152"/>
+    <link rel="apple-touch-icon" href="/images/shop/redemption/d16/icons/apple-touch-icon-180x180.png" sizes="180x180"/>
+    <link rel="apple-touch-icon" href="/images/shop/redemption/d16/icons/apple-touch-icon-precomposed.png"/>
+    <link rel="icon" type="image/png" href="/images/shop/redemption/d16/icons/favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="/images/shop/redemption/d16/icons/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/images/shop/redemption/d16/icons/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="/images/shop/redemption/d16/icons/favicon-160x160.png" sizes="160x160">
+    <link rel="icon" type="image/png" href="/images/shop/redemption/d16/icons/favicon-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="/images/shop/redemption/d16/icons/favicon-196x196.png" sizes="196x196">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+    <meta name="msapplication-TileColor" content="#f6f6f6"/> 
+    <meta name="msapplication-navbutton-color" content="#ea5d0b"/> 
+    <meta name="application-name" content="$!pagetitle"/> 
+    <meta name="msapplication-tooltip" content="$!pagetitle"/> 
+    <meta name="apple-mobile-web-app-title" content="$!pagetitle"/> 
+    <meta name="msapplication-TileImage" content="/images/shop/redemption/d16/icons/win8-tile-144x144.png"/> 
+    <meta name="msapplication-square70x70logo" content="/images/shop/redemption/d16/icons/win8-tile-70x70.png"/> 
+    <meta name="msapplication-square144x144logo" content="/images/shop/redemption/d16/icons/win8-tile-144x144.png"/> 
+    <meta name="msapplication-square150x150logo" content="/images/shop/redemption/d16/icons/win8-tile-150x150.png"/> 
+    <meta name="msapplication-wide310x150logo" content="/images/shop/redemption/d16/icons/win8-tile-310x150.png"/> 
+    <meta name="msapplication-square310x310logo" content="/images/shop/redemption/d16/icons/win8-tile-310x310.png"/> 
+    #if("$!{current_website.getAttribute('SHOP_WEBSITE_META_DESCRIPTION')}" != "")
+      <meta name="description" content="$!{current_website.getAttribute("SHOP_WEBSITE_META_DESCRIPTION")}">
+    #end
+    
+    
+    <link href="/scripts/bootstrap/4.6.1/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/stylesheets/bootstrap-icons/1.3.0/bootstrap-icons.css">
+    <link rel="stylesheet" href="$link.getTemplate("$site_layout.WEBSITE_STYLESHEET")">
+    
+    <script src="/scripts/jquery/3.6.0/jquery-3.6.0.min.js"></script>
+    <script src="/scripts/bootstrap/4.6.1/js/bootstrap.bundle.min.js"></script>
+    <script src="/scripts/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+    <script type="module" crossorigin src="/scripts/ebc/toast.js"></script>
+    <link rel="modulepreload" href="/scripts/ebc/vue.js">
+    
+    <noscript>
+      <style>
+        @media (min-width: 1200px) {
+          .menu-panel:not(.open) {
+            opacity: 1 !important;
+            visibility: visible !important;
+          }
+
+          .main-nav-sub-list, .main-nav-inner-list {
+            max-height: unset !important;
+          }
+        }
+      </style>
+    </noscript>
+  </head>
+  <body id="body" class="$!{template_type}">
+  #if(!$debugMode && "$!login_needed" != "false" && "$!is_system_page" != "true" && !$login)
+    #set($refresh_url = ${link.getAction("/taxfreenoncashbenefit/logout")})
+    #set($escaped_refresh_url = ${link.escapeSession($refresh_url.toString())})
+    #set($meta_data = "  <meta http-equiv='refresh' content='0; URL=$escaped_refresh_url'/>")
+    <script>
+      window.location.href = "$escaped_refresh_url"
+    </script>
+  #else
+    #set( $cookieImprintURL = $link.getTemplate("/shop/oip/einloesen2021/imprint") )
+    #parse($helper.getTemplate("/shop/cookie.vm"))
+    <i class="break-listener"></i>
+    <div class="main-wrapper" id="panel">
+      #if ($!site_layout.WEBSITE_TEMPLATE_HEADER)
+        #parse($helper.getTemplate($site_layout.WEBSITE_TEMPLATE_HEADER))
+      #else
+        #parse($helper.getTemplate("/shop/ebc/header.vm"))
+      #end
+      
+      <div class="main-header container-xl">
+        #parse($helper.getTemplate("/shop/oip/einloesen2021/banner.vm"))
+      </div>
+      
+      $screen_content
+      
+      #if ($!site_layout.WEBSITE_TEMPLATE_FOOTER)
+        #parse($helper.getTemplate($site_layout.WEBSITE_TEMPLATE_FOOTER))
+      #else
+      #parse($helper.getTemplate("/shop/ebc/footer.vm"))
+      #end
+      
+      <div class="dialog"></div>
+    </div>
+    <script src="/scripts/shop/einloesen/${scriptVersion}/scripts.js"></script>
+    <script src="/scripts/svg4everybody/svg4everybody.min.js"></script>
+    <!--<script src="/scripts/shop/einloesen/${scriptVersion}/productswiper.js"></script>-->
+    <script>
+      $(function(){
+        if ($("body").hasClass("ie")) {
+          $(".main-header").css("display","none");
+        }
+      });
+    </script>
+    #if( "$!templateSwitch" == "catalog" )
+      <script src="/scripts/jquery.lazyload.min.js"></script>
+      <script src="/scripts/shop/einloesen/${scriptVersion}/catalog.js"></script>
+    #end
+    #if("$!{site_layout.WEBSITE_DISABLE_PIWIK_ANALYSIS}" != "true" && !$helper.isTestSystem())
+      #set($websiteID = $current_website.getId())
+      #if( "$!websiteID" != "" && $websiteID != 5)
+        <!-- Piwik -->
+        <script>
+          var _paq = _paq || [];
+          #if("$!piwikCustomPageTitle" != "")
+            _paq.push(['setDocumentTitle', '$piwikCustomPageTitle']);
+          #end
+          ## Track PageView OR SiteSearch, not both at the same time
+          #if("$!piwikInternalSearchQuery" != "")
+            #if("$!piwikInternalSearchResults" == "")
+              #set($!piwikInternalSearchResults = false)
+            #end
+            #if("$!piwikInternalSearchCategory" == "")
+            _paq.push(["trackSiteSearch", "$!piwikInternalSearchQuery",false,$piwikInternalSearchResults]);
+            #else
+            _paq.push(["trackSiteSearch", "$!piwikInternalSearchQuery","$!piwikInternalSearchCategory",$piwikInternalSearchResults]);
+            #end
+          #else
+            #if("$!piwikCustomPageViewPath" != "")
+            _paq.push(['trackPageView', '$piwikCustomPageViewPath']); 
+            #else
+            _paq.push(['trackPageView']); 
+            #end
+          #end
+          #if("$!piwikTrackAllContentImpressions" == "true")
+            _paq.push(['trackAllContentImpressions']);
+          #end
+          _paq.push(["enableLinkTracking"]);
+          #if("$!piwikGoal" != "")
+            _paq.push(['trackGoal', $piwikGoal]);
+          #end
+          (function() {
+            var u=(("https:" == document.location.protocol) ? "https" : "http") + "://piwik.cadooz.com/";
+            _paq.push(["setTrackerUrl", u+"piwik.php"]);
+            _paq.push(["setSiteId", "$websiteID"]);
+            #if( "$!noCookiesAllowedPage" == "true" || "$!{session.getAttribute('com.cadooz.cookie.group.selection').allowStatistics()}" == "" || !$session.getAttribute('com.cadooz.cookie.group.selection').allowStatistics())
+            _paq.push(['disableCookies']);
+            #end
+            #if( !$helper.isTestSystem() || $helper.isStagingEnvironment() || $helper.isExternalTestEnvironment())
+            _paq.push(['setSecureCookie', true]);
+            #end
+            var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0]; g.type="text/javascript";
+            g.defer=true; g.async=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
+          })();
+        </script>
+        <!-- End Piwik Code -->
+      #end
+    #end
+  </body>
+  #end
+</html>
