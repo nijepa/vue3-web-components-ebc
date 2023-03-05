@@ -1,12 +1,12 @@
 <template>
   <section class="stage">
-    <div class="container-xl stage__container">
+    <div class="stage__container">
       <h2 class="my-4" :style="{ color: primaryColor }">
         {{ translate("title") }}
       </h2>
       <p class="card-text">{{ translate("text") }}</p>
       <div class="row">
-        <div class="col-sm-12 col-md-6 mb-3">
+        <div class="col-sm-12 col-md-6 mb-3" ref="passRef">
           <div class="card stage__card voucher-overview">
             <div class="card-body">
               <div class="d-flex justify-content-between">
@@ -32,7 +32,7 @@
                   </svg>
                 </button>
               </div>
-              <form id="password-form" onsubmit="savePasswordAction(event)">
+              <form id="password-form" @submit.prevent="savePasswordAction">
                 <div class="row my-3">
                   <div class="col-12 col-lg-4 font-weight-bold">
                     {{ translate("user-name") }}
@@ -42,61 +42,69 @@
                   </div>
                 </div>
                 <div class="row my-3">
-                  <div class="col-12 col-lg-4 font-weight-bold">
+                  <div class="col-12 col-lg-4 font-weight-bold mt-3">
                     {{ translate("password") }}
                   </div>
-                  <div class="col-12 col-lg-8">
-                    <span id="ebc-password" class="account-data">
-                      *********
-                    </span>
-                    <input
-                      v-if="isPass"
-                      id="oldPassword"
-                      name="oldPassword"
-                      class="account-data form-control mb-3"
-                      required
-                      minlength="9"
-                      type="password"
-                      :placeholder="translate('old_password')"
-                    />
-                    <p class="text-danger oldPassword" hidden></p>
-                    <input
-                      v-if="isPass"
-                      id="newPassword"
-                      name="newPassword"
-                      class="account-data form-control mb-3"
-                      required
-                      minlength="9"
-                      type="password"
-                      :placeholder="translate('new_password')"
-                    />
-                    <p class="text-danger newPassword" hidden></p>
-                    <input
-                      v-if="isPass"
-                      id="newPasswordRetype"
-                      name="newPasswordRetype"
-                      class="account-data form-control mb-3"
-                      required
-                      minlength="9"
-                      type="password"
-                      :placeholder="translate('repeat_new_password')"
-                    />
-                    <p class="text-danger newPasswordRetype" hidden></p>
-                    <button
-                      v-if="isPass"
-                      id="submit-changed-password"
-                      class="btn btn-primary account-data mb-3 disabled"
-                      type="submit"
-                    >
-                      {{ translate("save_changes") }}
-                    </button>
+                  <div class="col-12 col-lg-8 mt-3">
+                    <Transition name="slide-up" mode="out-in">
+                      <span
+                        id="ebc-password"
+                        class="account-data"
+                        v-if="!isPass"
+                      >
+                        *********
+                      </span>
+                      <div class="" v-else>
+                        <input
+                          v-if="isPass"
+                          id="oldPassword"
+                          name="oldPassword"
+                          class="account-data form-control mb-3"
+                          required
+                          minlength="9"
+                          type="password"
+                          :placeholder="translate('old_password')"
+                        />
+                        <p class="text-danger oldPassword" hidden></p>
+                        <input
+                          v-if="isPass"
+                          id="newPassword"
+                          name="newPassword"
+                          class="account-data form-control mb-3"
+                          required
+                          minlength="9"
+                          type="password"
+                          :placeholder="translate('new_password')"
+                        />
+                        <p class="text-danger newPassword" hidden></p>
+                        <input
+                          v-if="isPass"
+                          id="newPasswordRetype"
+                          name="newPasswordRetype"
+                          class="account-data form-control mb-3"
+                          required
+                          minlength="9"
+                          type="password"
+                          :placeholder="translate('repeat_new_password')"
+                        />
+                        <p class="text-danger newPasswordRetype" hidden></p>
+                        <button
+                          v-if="isPass"
+                          id="submit-changed-password"
+                          class="btn btn-primary account-data mb-3 disabled"
+                          type="submit"
+                        >
+                          {{ translate("save_changes") }}
+                        </button>
+                      </div>
+                    </Transition>
                   </div>
                 </div>
               </form>
             </div>
           </div>
         </div>
-        <div class="col-sm-12 col-md-6 mb-3">
+        <div class="col-sm-12 col-md-6 mb-3" ref="emailRef">
           <div class="card stage__card voucher-overview">
             <div class="card-body">
               <div class="d-flex justify-content-between">
@@ -127,47 +135,57 @@
                   <div class="col-12 col-lg-4 font-weight-bold">
                     {{ translate("email") }}
                   </div>
-                  <div class="col-12 col-lg-8">
+                  <div class="col-12 col-lg-8" v-if="!isEmail">
                     <span id="deliveryAddress">
-                      {{ receivedData.deliveryAddress }}
+                      {{ receivedData.deliveryAddress || "no email" }}
                     </span>
                   </div>
-                  <div
-                    class="col-12 col-lg-4 font-weight-bold mt-4 additional-email"
-                  >
-                    {{ translate("alternative_email") }}
-                  </div>
-                  <div class="col-12 col-lg-8">
-                    <span id="additionalDeliveryAddress" class="address-data">
-                      {{ receivedData.additionalDeliveryAddress }}
-                    </span>
-                  </div>
-                  <div
-                    class="col-12 col-lg-8 mt-4 additional-email-data"
-                    v-if="isEmail"
-                  >
-                    <input
-                      id="additionalDeliveryEmailAddress"
-                      class="additional-email address-data form-control"
-                      type="email"
-                      v-model="altEmail"
-                      required
-                    />
-                    <button
-                      id="submit-address"
-                      class="btn btn-primary mt-3 address-data disabled"
-                      type="submit"
+                </div>
+                <div class="row my-3">
+                  <Transition name="slide-up" mode="out-in">
+                    <div
+                      class="col-12 col-lg-4 font-weight-bold additional-email mt-3"
+                      v-if="isAditionalEmail "
                     >
-                      {{ translate("send_to_alternative_email") }}
-                    </button>
-                    <button
-                      id="delete-address"
-                      onclick="deleteAddressAction(event)"
-                      class="btn btn-outline product-btn mt-3 address-data disabled"
-                      type="submit"
-                    >
-                      {{ translate("delete_alternative_email") }}
-                    </button>
+                      {{ translate("alternative_email") }}
+                    </div>
+                  </Transition>
+                  <div class="col-12 col-lg-8 mt-3">
+                    <Transition name="slide-up" mode="out-in">
+                      <span
+                        id="additionalDeliveryAddress"
+                        class="address-data"
+                        v-if="!isEmail "
+                      >
+                        {{ receivedData.additionalDeliveryAddress }}
+                      </span>
+                      <div class="" v-else>
+                        <input
+                          id="additionalDeliveryEmailAddress"
+                          class="additional-email address-data form-control"
+                          type="email"
+                          v-model="altEmail"
+                          :placeholder="receivedData.additionalDeliveryAddress"
+                          required
+                        />
+                        <button
+                          id="submit-address"
+                          class="btn btn-primary mt-3 address-data disabled"
+                          type="submit"
+                        >
+                          {{ translate("send_to_alternative_email") }}
+                        </button>
+                        <button
+                          id="delete-address"
+                          onclick="deleteAddressAction(event)"
+                          class="btn btn-outline product-btn mt-3 address-data disabled"
+                          type="submit"
+                          v-if="receivedData.additionalDeliveryAddress"
+                        >
+                          {{ translate("delete_alternative_email") }}
+                        </button>
+                      </div>
+                    </Transition>
                   </div>
                 </div>
               </form>
@@ -183,6 +201,7 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { useFetch } from "../composables/useFetch";
 import { resolveUrl } from "../utils/resolveUrl";
+import { useDetectOutsideClick } from "../composables/useDetectOutsideClick";
 
 // setting props
 const props = defineProps({
@@ -214,6 +233,19 @@ const translate = (key) => {
   return JSON.parse(props.translations)[prefix + key];
 };
 
+const passRef = ref();
+const emailRef = ref();
+
+useDetectOutsideClick(passRef, () => {
+  isPass.value = false;
+});
+useDetectOutsideClick(emailRef, () => {
+  isEmail.value = false;
+});
+
+const isAditionalEmail = computed(() => {
+  return (isEmail.value || receivedData.value.additionalDeliveryAddress) && receivedData.value.deliveryAddress;
+});
 // fetch user data
 const receivedData = ref([]);
 const altEmail = ref(null);
@@ -234,11 +266,9 @@ onMounted(async () => {
 const isPass = ref(null);
 const isEmail = ref(null);
 const togglePass = () => {
-  isEmail.value = false;
   isPass.value = !isPass.value;
 };
 const toggleEmail = async () => {
-  isPass.value = false;
   isEmail.value = !isEmail.value;
   if (isEmail.value) {
     await useFetch(props.emailUrl, "POST", {
@@ -283,7 +313,6 @@ const saveAddress = async () => {
 * {
   scroll-margin-top: 150px;
 }
-
 *,
 ::after,
 ::before {
@@ -297,8 +326,16 @@ body {
   font-family: "Open Sans Regular", sans-serif;
   color: #000000;
 }
+.stage {
+  padding-bottom: 1.5rem;
+}
 .stage__container {
   position: relative;
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
 }
 @media (min-width: 992px) {
   .stage {
@@ -310,29 +347,10 @@ body {
     padding: 1.5rem 0 3rem;
   }
 }
-.stage {
-  padding-bottom: 1.5rem;
-}
 @media (min-width: 1200px) {
-  .container,
-  .container-lg,
-  .container-md,
-  .container-sm,
-  .container-xl {
+  .stage__container {
     max-width: 1140px;
   }
-}
-.container,
-.container-fluid,
-.container-lg,
-.container-md,
-.container-sm,
-.container-xl {
-  width: 100%;
-  padding-right: 15px;
-  padding-left: 15px;
-  margin-right: auto;
-  margin-left: auto;
 }
 .account-data,
 .address-data {
@@ -378,6 +396,10 @@ button:not(:disabled) {
 .p-0 {
   padding: 0 !important;
 }
+.mb-3,
+.my-3 {
+  margin-bottom: 1rem !important;
+}
 .mb-4,
 .my-4 {
   margin-bottom: 1.5rem !important;
@@ -386,11 +408,6 @@ button:not(:disabled) {
 .my-4 {
   margin-top: 1.5rem !important;
 }
-.mb-3,
-.my-3 {
-  margin-bottom: 1rem !important;
-}
-
 .mt-3,
 .my-3 {
   margin-top: 1rem !important;
@@ -449,19 +466,9 @@ h6 {
   margin-bottom: 0.5rem;
 }
 .row {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
   margin-right: -15px;
   margin-left: -15px;
 }
-
-.mb-3,
-.my-3 {
-  margin-bottom: 1rem !important;
-}
-
 .font-weight-bold {
   font-weight: 700 !important;
 }
@@ -571,6 +578,7 @@ h6,
   width: 100%;
   padding-right: 15px;
   padding-left: 15px;
+  float: left;
 }
 .col-12 {
   -ms-flex: 0 0 100%;
@@ -642,6 +650,7 @@ h6,
 }
 .stage__card .card-body {
   justify-content: unset;
+  min-height: 191px;
 }
 .card-body {
   -ms-flex: 1 1 auto;
@@ -739,5 +748,32 @@ h6,
   border-color: #b30000;
   box-shadow: 0 0 0 0.2rem #d9d9d9;
   color: white;
+}
+.bi:hover {
+  fill: black;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.25s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
+}
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.25s ease;
+}
+.slide-up-enter-from {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+.slide-up-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
 }
 </style>

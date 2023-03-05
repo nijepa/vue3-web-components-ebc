@@ -10,38 +10,46 @@
       href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <style>
-      * {
-        font-family: 'Open Sans', sans-serif;
-      }
-      header {
-        display: flex;
-        background-color: darkslategrey;
-        padding: .5em;
-      }
-      #search {
-        fill: white;
-        cursor: pointer;
-        width: 1.7em;
-        stroke: white;
-        stroke-width: 0.1;
-      }
-      #search:hover {
-        stroke-width: 2px;
-      }
-    </style>
   </head>
-
   <body>
-    <h1>Search Component!</h1>
-
-
+    <h1>EBC account details!</h1>
     <div id="app">
       <custom-ebc />
     </div>
+
     <script type="module" src="/main.js"></script>
     <script>
-      // const search = document.querySelector('custom-search');
+      const ebc = document.querySelector("custom-ebc");
+      function setAttributes(el, attrs) {
+        for (var key in attrs) {
+          const attr =
+            typeof attrs[key] !== "string"
+              ? JSON.stringify(attrs[key])
+              : attrs[key];
+          el.setAttribute(key, attr);
+        }
+      }
+      const ebcProps = {
+        translations: {
+          "shop.ebc.my_account.title": "account",
+          "shop.ebc.my_account.text": "text",
+          "shop.ebc.my_account.access-data": "User",
+          "shop.ebc.my_account.user-name": "name",
+          "shop.ebc.my_account.password": "pass",
+          "shop.ebc.my_account.old_password": "old password",
+          "shop.ebc.my_account.new_password": "new password",
+          "shop.ebc.my_account.repeat_new_password": "repeat new password",
+          "shop.ebc.my_account.save_changes": "save",
+          "shop.ebc.my_account.delivery-address": "email",
+          "shop.ebc.my_account.email": "email",
+          "shop.ebc.my_account.alternative_email": "altemail",
+          "shop.ebc.my_account.send_to_alternative_email": "send",
+          "shop.ebc.my_account.delete_alternative_email": "del",
+        },
+        "primary-color": "rgb(237, 107, 125)",
+        user: "Djuro spirov",
+      };
+      setAttributes(ebc, ebcProps);
       // const showToast = () => {
       //   search.setAttribute('is-active', 'true');
       // };
