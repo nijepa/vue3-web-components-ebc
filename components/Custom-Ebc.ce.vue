@@ -385,7 +385,7 @@ button:not(:disabled) {
 }
 .edit-btn {
   background: transparent;
-  color: #b30000;
+  color: v-bind(props.primaryColor);
   border: none;
   padding: 0 !important;
 }
@@ -428,7 +428,7 @@ h4 {
   margin-top: 0;
   margin-bottom: 0.5rem;
   line-height: 1.25;
-  color: #b30000;
+  color: v-bind(props.primaryColor);
 }
 .row {
   margin-right: -15px;
@@ -439,7 +439,7 @@ h4 {
 }
 .overview-title {
   font-size: 1.75rem;
-  color: #b30000;
+  color: v-bind(props.primaryColor);
 }
 .overview-title {
   text-align: center;
@@ -592,7 +592,7 @@ svg {
   border-radius: 0.5rem;
 }
 .btn-primary {
-  background-color: #b30000;
+  background-color: v-bind(props.primaryColor);
   color: rgb(255, 255, 255);
   outline: none;
   border: 0;
@@ -625,14 +625,14 @@ svg {
   color: rgb(255, 255, 255);
 }
 .product-btn {
-  border-color: #b30000;
-  color: #b30000;
+  border-color: v-bind(props.primaryColor);
+  color: v-bind(props.primaryColor);
 }
 .product-btn:hover,
 .product-btn:active,
 .product-btn:focus {
-  background-color: #b30000;
-  border-color: #b30000;
+  background-color: v-bind(props.primaryColor);
+  border-color: v-bind(props.primaryColor);
   box-shadow: 0 0 0 0.2rem #d9d9d9;
   color: white;
 }

@@ -55,10 +55,10 @@
       // const showToast = () => {
       //   search.setAttribute('is-active', 'true');
       // };
-      const searchClosed = (e) => {
-        console.log('stiga', e)
+      const showToast = (e) => {
+        console.log('stiga', e.detail)
       };
-      window.addEventListener('toggle-toast', searchClosed);
+      window.addEventListener('toggle-toast', showToast);
       // const msg = {
       //   empty: 'empty',
       //   placeholder: 'search',
