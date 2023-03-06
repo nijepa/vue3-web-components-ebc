@@ -11,6 +11,7 @@
       rel="stylesheet"
     />
   </head>
+
   <body>
     <h1>EBC account details!</h1>
     <div id="app">
@@ -47,16 +48,17 @@
           "shop.ebc.my_account.delete_alternative_email": "del",
         },
         "primary-color": "rgb(237, 107, 125)",
+        font: "'Open Sans', sans-serif",
         user: "Djuro spirov",
       };
       setAttributes(ebc, ebcProps);
       // const showToast = () => {
       //   search.setAttribute('is-active', 'true');
       // };
-      // const searchClosed = () => {
-      //   search.setAttribute('is-active', 'false');
-      // };
-      // window.addEventListener('close-search', searchClosed);
+      const searchClosed = (e) => {
+        console.log('stiga', e)
+      };
+      window.addEventListener('toggle-toast', searchClosed);
       // const msg = {
       //   empty: 'empty',
       //   placeholder: 'search',

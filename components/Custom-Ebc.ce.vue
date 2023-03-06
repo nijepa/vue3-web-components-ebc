@@ -1,5 +1,5 @@
 <template>
-  <section class="stage">
+  <section class="stage" ref="accountWrapper">
     <div class="stage__container">
       <h2 class="my-4" :style="{ color: primaryColor }">
         {{ translate("title") }}
@@ -13,7 +13,7 @@
                 <h4 class="overview-title" @click="togglePass">
                   {{ translate("access-data") }}
                 </h4>
-                <button @click="togglePass" class="edit-btn p-0">
+                <button @click="togglePass" class="edit-btn">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -32,7 +32,7 @@
                   </svg>
                 </button>
               </div>
-              <form id="password-form" @submit.prevent="savePasswordAction">
+              <form id="password-form" @submit.prevent="savePassword">
                 <div class="row my-3">
                   <div class="col-12 col-lg-4 font-weight-bold">
                     {{ translate("user-name") }}
@@ -56,7 +56,7 @@
                       </span>
                       <div class="" v-else>
                         <input
-                          v-if="isPass"
+                          v-model="oldPassword"
                           id="oldPassword"
                           name="oldPassword"
                           class="account-data form-control mb-3"
@@ -65,9 +65,9 @@
                           type="password"
                           :placeholder="translate('old_password')"
                         />
-                        <p class="text-danger oldPassword" hidden></p>
+                        <p class="text-danger oldPassword" hidden>yy</p>
                         <input
-                          v-if="isPass"
+                          v-model="newPassword"
                           id="newPassword"
                           name="newPassword"
                           class="account-data form-control mb-3"
@@ -78,7 +78,7 @@
                         />
                         <p class="text-danger newPassword" hidden></p>
                         <input
-                          v-if="isPass"
+                          v-model="newPasswordRetype"
                           id="newPasswordRetype"
                           name="newPasswordRetype"
                           class="account-data form-control mb-3"
@@ -89,7 +89,6 @@
                         />
                         <p class="text-danger newPasswordRetype" hidden></p>
                         <button
-                          v-if="isPass"
                           id="submit-changed-password"
                           class="btn btn-primary account-data mb-3 disabled"
                           type="submit"
@@ -111,7 +110,7 @@
                 <h4 class="overview-title">
                   {{ translate("delivery-address") }}
                 </h4>
-                <button @click="toggleEmail" class="edit-btn p-0">
+                <button @click="toggleEmail" class="edit-btn">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -135,7 +134,10 @@
                   <div class="col-12 col-lg-4 font-weight-bold">
                     {{ translate("email") }}
                   </div>
-                  <div class="col-12 col-lg-8" v-if="!isEmail">
+                  <div
+                    class="col-12 col-lg-8"
+                    v-if="!isEmail || receivedData.deliveryAddress"
+                  >
                     <span id="deliveryAddress">
                       {{ receivedData.deliveryAddress || "no email" }}
                     </span>
@@ -145,7 +147,7 @@
                   <Transition name="slide-up" mode="out-in">
                     <div
                       class="col-12 col-lg-4 font-weight-bold additional-email mt-3"
-                      v-if="isAditionalEmail "
+                      v-if="isAditionalEmail"
                     >
                       {{ translate("alternative_email") }}
                     </div>
@@ -155,7 +157,7 @@
                       <span
                         id="additionalDeliveryAddress"
                         class="address-data"
-                        v-if="!isEmail "
+                        v-if="!isEmail"
                       >
                         {{ receivedData.additionalDeliveryAddress }}
                       </span>
@@ -194,11 +196,12 @@
         </div>
       </div>
     </div>
+    <button @click="showToast">aa</button>
   </section>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, computed, reactive, toRefs, watch, onMounted } from "vue";
 import { useFetch } from "../composables/useFetch";
 import { resolveUrl } from "../utils/resolveUrl";
 import { useDetectOutsideClick } from "../composables/useDetectOutsideClick";
@@ -232,10 +235,9 @@ const prefix = "shop.ebc.my_account.";
 const translate = (key) => {
   return JSON.parse(props.translations)[prefix + key];
 };
-
+// handle click outside
 const passRef = ref();
 const emailRef = ref();
-
 useDetectOutsideClick(passRef, () => {
   isPass.value = false;
 });
@@ -243,12 +245,29 @@ useDetectOutsideClick(emailRef, () => {
   isEmail.value = false;
 });
 
-const isAditionalEmail = computed(() => {
-  return (isEmail.value || receivedData.value.additionalDeliveryAddress) && receivedData.value.deliveryAddress;
+onMounted(async () => {
+  await getUserData();
+  console.log(receivedData.value);
 });
+
+const isAditionalEmail = computed(() => {
+  return (
+    (isEmail.value || receivedData.value.additionalDeliveryAddress) &&
+    receivedData.value.deliveryAddress
+  );
+});
+
+const passwords = reactive({
+  oldPassword: null,
+  newPassword: null,
+  newPasswordRetype: null,
+});
+const { oldPassword, newPassword, newPasswordRetype } = toRefs(passwords);
+const altEmail = ref(null);
+// handle errors
+const handleError = (errors) => {};
 // fetch user data
 const receivedData = ref([]);
-const altEmail = ref(null);
 const getUserData = async () => {
   const received = await useFetch(props.emailUrl, "POST", {
     action: "load_data",
@@ -257,16 +276,16 @@ const getUserData = async () => {
     ? handleError(received.errorMessage)
     : (receivedData.value = received);
 };
-
-onMounted(async () => {
-  await getUserData();
-  console.log(receivedData.value);
-});
-
+// handle forms states
 const isPass = ref(null);
 const isEmail = ref(null);
-const togglePass = () => {
+const togglePass = async () => {
   isPass.value = !isPass.value;
+  if (isPass.value) {
+    await useFetch(props.credentialUrl, "POST", {
+      action: "edit",
+    });
+  }
 };
 const toggleEmail = async () => {
   isEmail.value = !isEmail.value;
@@ -276,7 +295,13 @@ const toggleEmail = async () => {
     });
   }
 };
-
+// save data end-points calls
+const savePassword = async () => {
+  await useFetch(props.credentialUrl, "POST", {
+    action: "save",
+    ...passwords,
+  });
+};
 const saveAddress = async () => {
   await useFetch(props.emailUrl, "POST", {
     action: "save",
@@ -295,19 +320,18 @@ const saveAddress = async () => {
 //     }
 //   }
 // );
-
-// // creating & emitting events
-// const emit = defineEmits(['close-search']);
-// const searchWrapper = ref(null);
-// const hideSearch = () => {
-//   active.value = false;
-//   searchWrapper.value.dispatchEvent(
-//     new CustomEvent('close-search', {
-//       bubbles: true,
-//       composed: true,
-//     })
-//   );
-// };
+// creating & emitting event for shownig toast
+const emit = defineEmits(["toggle-toast"]);
+const accountWrapper = ref(null);
+const showToast = () => {
+  accountWrapper.value.dispatchEvent(
+    new CustomEvent("toggle-toast", {
+      bubbles: true,
+      composed: true,
+      detail: { error: "eeee" },
+    })
+  );
+};
 </script>
 <style>
 * {
@@ -318,16 +342,9 @@ const saveAddress = async () => {
 ::before {
   box-sizing: border-box;
 }
-body {
-  opacity: 1 !important;
-  font-size: 16px;
-  line-height: 1.5;
-  font-weight: 400;
-  font-family: "Open Sans Regular", sans-serif;
-  color: #000000;
-}
 .stage {
   padding-bottom: 1.5rem;
+  font-family: v-bind(props.font);
 }
 .stage__container {
   position: relative;
@@ -337,21 +354,7 @@ body {
   margin-right: auto;
   margin-left: auto;
 }
-@media (min-width: 992px) {
-  .stage {
-    padding: 2rem 0 3.5rem;
-  }
-}
-@media (min-width: 768px) {
-  .stage {
-    padding: 1.5rem 0 3rem;
-  }
-}
-@media (min-width: 1200px) {
-  .stage__container {
-    max-width: 1140px;
-  }
-}
+
 .account-data,
 .address-data {
   width: 100%;
@@ -359,14 +362,6 @@ body {
 .form-control {
   height: 3rem;
 }
-.mb-3,
-.my-3 {
-  margin-bottom: 1rem !important;
-}
-.d-none {
-  display: none !important;
-}
-
 .form-control {
   display: block;
   width: 100%;
@@ -392,8 +387,6 @@ button:not(:disabled) {
   background: transparent;
   color: #b30000;
   border: none;
-}
-.p-0 {
   padding: 0 !important;
 }
 .mb-3,
@@ -412,58 +405,30 @@ button:not(:disabled) {
 .my-3 {
   margin-top: 1rem !important;
 }
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-.h1,
-.h2,
-.h3,
-.h4,
-.h5,
-.h6 {
-  line-height: 1.25;
-  /*color: #b30000;*/
-}
-h2,
-.h2 {
+
+h2 {
   font-size: 1.75rem;
+  line-height: 1.25;
 }
-h4,
-.h4 {
+h4 {
   font-size: 1.1875rem;
+  line-height: 1.25;
 }
-.h4,
 h4 {
   font-size: 1.5rem;
 }
 
-.h1,
-.h2,
-.h3,
-.h4,
-.h5,
-.h6,
-h1,
 h2,
-h3,
-h4,
-h5,
-h6 {
-  margin-bottom: 0.5rem;
+h4 {
   font-weight: 500;
   line-height: 1.2;
 }
-h1,
 h2,
-h3,
-h4,
-h5,
-h6 {
+h4 {
   margin-top: 0;
   margin-bottom: 0.5rem;
+  line-height: 1.25;
+  color: #b30000;
 }
 .row {
   margin-right: -15px;
@@ -483,97 +448,16 @@ h6 {
   width: 1.5rem;
   height: 1.5rem;
 }
-
 svg {
   overflow: hidden;
   vertical-align: middle;
 }
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-.h1,
-.h2,
-.h3,
-.h4,
-.h5,
-.h6 {
-  line-height: 1.25;
-  color: #b30000;
-}
-
 .col,
-.col-1,
-.col-10,
-.col-11,
 .col-12,
-.col-2,
-.col-3,
-.col-4,
-.col-5,
-.col-6,
-.col-7,
-.col-8,
-.col-9,
-.col-auto,
-.col-lg,
-.col-lg-1,
-.col-lg-10,
-.col-lg-11,
-.col-lg-12,
-.col-lg-2,
-.col-lg-3,
 .col-lg-4,
-.col-lg-5,
-.col-lg-6,
-.col-lg-7,
 .col-lg-8,
-.col-lg-9,
-.col-lg-auto,
-.col-md,
-.col-md-1,
-.col-md-10,
-.col-md-11,
-.col-md-12,
-.col-md-2,
-.col-md-3,
-.col-md-4,
-.col-md-5,
 .col-md-6,
-.col-md-7,
-.col-md-8,
-.col-md-9,
-.col-md-auto,
-.col-sm,
-.col-sm-1,
-.col-sm-10,
-.col-sm-11,
-.col-sm-12,
-.col-sm-2,
-.col-sm-3,
-.col-sm-4,
-.col-sm-5,
-.col-sm-6,
-.col-sm-7,
-.col-sm-8,
-.col-sm-9,
-.col-sm-auto,
-.col-xl,
-.col-xl-1,
-.col-xl-10,
-.col-xl-11,
-.col-xl-12,
-.col-xl-2,
-.col-xl-3,
-.col-xl-4,
-.col-xl-5,
-.col-xl-6,
-.col-xl-7,
-.col-xl-8,
-.col-xl-9,
-.col-xl-auto {
+.col-sm-12 {
   position: relative;
   width: 100%;
   padding-right: 15px;
@@ -586,17 +470,23 @@ h6,
   max-width: 100%;
 }
 @media (min-width: 992px) {
+  .stage {
+    padding: 2rem 0 3.5rem;
+  }
   .col-lg-4 {
     -ms-flex: 0 0 33.333333%;
     flex: 0 0 33.333333%;
     max-width: 33.333333%;
   }
-}
-@media (min-width: 992px) {
   .col-lg-8 {
     -ms-flex: 0 0 66.666667%;
     flex: 0 0 66.666667%;
     max-width: 66.666667%;
+  }
+}
+@media (min-width: 1200px) {
+  .stage__container {
+    max-width: 1140px;
   }
 }
 @media (min-width: 576px) {
@@ -607,6 +497,9 @@ h6,
   }
 }
 @media (min-width: 768px) {
+  .stage {
+    padding: 1.5rem 0 3rem;
+  }
   .col-md-6 {
     -ms-flex: 0 0 50%;
     flex: 0 0 50%;
@@ -662,7 +555,6 @@ h6,
   -ms-flex-pack: justify !important;
   justify-content: space-between !important;
 }
-
 .d-flex {
   display: -ms-flexbox !important;
   display: flex !important;
@@ -725,11 +617,6 @@ h6,
 .btn-primary:focus,
 .btn-primary:not(:disabled):not(.disabled).active,
 .btn-primary:not(:disabled):not(.disabled):active,
-.btn-soft-primary:hover,
-.btn-soft-primary:active,
-.btn-soft-primary:focus,
-.btn-soft-primary:not(:disabled):not(.disabled).active,
-.btn-soft-primary:not(:disabled):not(.disabled):active,
 .show > .btn-primary.dropdown-toggle {
   background-color: #660000;
   border-color: #660000;
