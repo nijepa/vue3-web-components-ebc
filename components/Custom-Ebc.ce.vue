@@ -2,16 +2,16 @@
   <section class="stage" ref="accountWrapper">
     <div class="stage__container">
       <h2 class="my-4" :style="{ color: primaryColor }">
-        {{ translate("title") }}
+        {{ translate('title') }}
       </h2>
-      <p class="card-text">{{ translate("text") }}</p>
+      <p class="card-text">{{ translate('text') }}</p>
       <div class="row">
         <div class="col-sm-12 col-md-6 mb-3" ref="passRef">
           <div class="card stage__card voucher-overview">
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <h4 class="overview-title" @click="togglePass">
-                  {{ translate("access-data") }}
+                  {{ translate('access-data') }}
                 </h4>
                 <button @click="togglePass" class="edit-btn">
                   <svg
@@ -35,7 +35,7 @@
               <form id="password-form" @submit.prevent="savePassword">
                 <div class="row my-3">
                   <div class="col-12 col-lg-4 font-weight-bold">
-                    {{ translate("user-name") }}
+                    {{ translate('user-name') }}
                   </div>
                   <div class="col-12 col-lg-8">
                     {{ user }}
@@ -43,7 +43,7 @@
                 </div>
                 <div class="row my-3">
                   <div class="col-12 col-lg-4 font-weight-bold mt-3">
-                    {{ translate("password") }}
+                    {{ translate('password') }}
                   </div>
                   <div class="col-12 col-lg-8 mt-3">
                     <Transition name="slide-up" mode="out-in">
@@ -93,7 +93,7 @@
                           class="btn btn-primary account-data mb-3 disabled"
                           type="submit"
                         >
-                          {{ translate("save_changes") }}
+                          {{ translate('save_changes') }}
                         </button>
                       </div>
                     </Transition>
@@ -108,7 +108,7 @@
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <h4 class="overview-title">
-                  {{ translate("delivery-address") }}
+                  {{ translate('delivery-address') }}
                 </h4>
                 <button @click="toggleEmail" class="edit-btn">
                   <svg
@@ -132,14 +132,14 @@
               <form id="address-form" @submit.prevent="saveAddress">
                 <div class="row my-3">
                   <div class="col-12 col-lg-4 font-weight-bold">
-                    {{ translate("email") }}
+                    {{ translate('email') }}
                   </div>
                   <div
                     class="col-12 col-lg-8"
                     v-if="!isEmail || receivedData.deliveryAddress"
                   >
                     <span id="deliveryAddress">
-                      {{ receivedData.deliveryAddress || "no email" }}
+                      {{ receivedData.deliveryAddress || 'no email' }}
                     </span>
                   </div>
                 </div>
@@ -149,7 +149,7 @@
                       class="col-12 col-lg-4 font-weight-bold additional-email mt-3"
                       v-if="isAditionalEmail"
                     >
-                      {{ translate("alternative_email") }}
+                      {{ translate('alternative_email') }}
                     </div>
                   </Transition>
                   <div class="col-12 col-lg-8 mt-3">
@@ -175,7 +175,7 @@
                           class="btn btn-primary mt-3 address-data disabled"
                           type="submit"
                         >
-                          {{ translate("send_to_alternative_email") }}
+                          {{ translate('send_to_alternative_email') }}
                         </button>
                         <button
                           id="delete-address"
@@ -184,7 +184,7 @@
                           type="submit"
                           v-if="receivedData.additionalDeliveryAddress"
                         >
-                          {{ translate("delete_alternative_email") }}
+                          {{ translate('delete_alternative_email') }}
                         </button>
                       </div>
                     </Transition>
@@ -201,10 +201,10 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, toRefs, watch, onMounted } from "vue";
-import { useFetch } from "../composables/useFetch";
-import { resolveUrl } from "../utils/resolveUrl";
-import { useDetectOutsideClick } from "../composables/useDetectOutsideClick";
+import { ref, computed, reactive, toRefs, watch, onMounted } from 'vue';
+import { useFetch } from '../composables/useFetch';
+import { resolveUrl } from '../utils/resolveUrl';
+import { useDetectOutsideClick } from '../composables/useDetectOutsideClick';
 
 // setting props
 const props = defineProps({
@@ -213,11 +213,11 @@ const props = defineProps({
   },
   primaryColor: {
     type: String,
-    default: "#fff",
+    default: '#fff',
   },
   font: {
     type: String,
-    default: "",
+    default: '',
   },
   user: {
     type: String,
@@ -231,7 +231,7 @@ const props = defineProps({
 });
 
 // return translations by keys
-const prefix = "shop.ebc.my_account.";
+const prefix = 'shop.ebc.my_account.';
 const translate = (key) => {
   return JSON.parse(props.translations)[prefix + key];
 };
@@ -269,8 +269,8 @@ const handleError = (errors) => {};
 // fetch user data
 const receivedData = ref([]);
 const getUserData = async () => {
-  const received = await useFetch(props.emailUrl, "POST", {
-    action: "load_data",
+  const received = await useFetch(props.emailUrl, 'POST', {
+    action: 'load_data',
   });
   received.error.length
     ? handleError(received.errorMessage)
@@ -282,29 +282,29 @@ const isEmail = ref(null);
 const togglePass = async () => {
   isPass.value = !isPass.value;
   if (isPass.value) {
-    await useFetch(props.credentialUrl, "POST", {
-      action: "edit",
+    await useFetch(props.credentialUrl, 'POST', {
+      action: 'edit',
     });
   }
 };
 const toggleEmail = async () => {
   isEmail.value = !isEmail.value;
   if (isEmail.value) {
-    await useFetch(props.emailUrl, "POST", {
-      action: "edit",
+    await useFetch(props.emailUrl, 'POST', {
+      action: 'edit',
     });
   }
 };
 // save data end-points calls
 const savePassword = async () => {
-  await useFetch(props.credentialUrl, "POST", {
-    action: "save",
+  await useFetch(props.credentialUrl, 'POST', {
+    action: 'save',
     ...passwords,
   });
 };
 const saveAddress = async () => {
-  await useFetch(props.emailUrl, "POST", {
-    action: "save",
+  await useFetch(props.emailUrl, 'POST', {
+    action: 'save',
     additionalDeliveryEmailAddress: altEmail.value,
   });
 };
@@ -321,14 +321,14 @@ const saveAddress = async () => {
 //   }
 // );
 // creating & emitting event for shownig toast
-const emit = defineEmits(["toggle-toast"]);
+const emit = defineEmits(['toggle-toast']);
 const accountWrapper = ref(null);
 const showToast = () => {
   accountWrapper.value.dispatchEvent(
-    new CustomEvent("toggle-toast", {
+    new CustomEvent('toggle-toast', {
       bubbles: true,
       composed: true,
-      detail: { error: "eeee" },
+      detail: { error: 'eeee' },
     })
   );
 };
@@ -377,9 +377,23 @@ const showToast = () => {
   border-radius: 0.25rem;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
-[type="button"]:not(:disabled),
-[type="reset"]:not(:disabled),
-[type="submit"]:not(:disabled),
+.form-control.is-invalid,
+.was-validated .form-control:invalid {
+  border-color: #dc3545;
+  padding-right: calc(1.5em + 0.75rem) !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right calc(0.375em + 0.1875rem) center;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+.form-control.is-invalid:focus,
+.was-validated .form-control:invalid:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgb(220 53 69 / 25%);
+}
+[type='button']:not(:disabled),
+[type='reset']:not(:disabled),
+[type='submit']:not(:disabled),
 button:not(:disabled) {
   cursor: pointer;
 }
@@ -518,37 +532,29 @@ svg {
   flex-direction: column;
   min-width: 0;
   word-wrap: break-word;
-  background-color: #fff;
+  /* background-color: #fff; */
   background-clip: border-box;
   border: 1px solid rgba(0, 0, 0, 0.125);
   border-radius: 0.25rem;
-}
-.voucher-overview {
-  padding: 1rem;
-  background: rgb(255, 255, 255);
-  border-radius: 0.5rem;
-  box-shadow: 0 0.125rem 0.5rem rgb(0 0 0 / 12%);
 }
 .stage__card {
   height: 100%;
   background-color: transparent;
   border: none;
+  padding: 1rem;
+  background: rgb(255, 255, 255);
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.5rem rgb(0 0 0 / 12%);
 }
-
 .stage__card .card-body {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* justify-content: center; */
   height: 100%;
-}
-.stage__card .card-body {
   justify-content: unset;
   min-height: 191px;
-}
-.card-body {
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
-  min-height: 1px;
   padding: 1.25rem;
 }
 .justify-content-between {
