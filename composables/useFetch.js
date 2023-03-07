@@ -4,13 +4,13 @@ export const useFetch = async (url, method, data = undefined) => {
   try {
     const response = await fetch(url, {
       method,
-      body: JSON.stringify(data),
-      headers: {
-        "Content-type": "html",
-      },
+      body: data,
+      // headers: {
+      //   "Content-type": "html",
+      // },
     });
     //console.log('success', response);
-    return { error: [], deliveryAddress: 'test@test.com', additionalDeliveryAddress: 'alt@test.com'}
+    //return { error: [], deliveryAddress: 'test@test.com', additionalDeliveryAddress: 'alt@test.com'}
     return response.json();
   } catch (error) {
     console.log("Error: ", error);

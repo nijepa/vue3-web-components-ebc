@@ -151,9 +151,17 @@
                     >
                       {{ translate('alternative_email') }}
                     </div>
-                    <div class="col-12 col-lg-4 font-weight-bold additional-email mt-3" v-else></div>
+                    <div
+                      class="col-12 col-lg-4 font-weight-bold additional-email mt-3"
+                      v-else
+                    ></div>
                   </Transition>
-                  <div class="col-12 col-lg-8 mt-3" :class="isEmail && !receivedData.deliveryAddress && 'no-email'">
+                  <div
+                    class="col-12 col-lg-8 mt-3"
+                    :class="
+                      isEmail && !receivedData.deliveryAddress && 'no-email'
+                    "
+                  >
                     <Transition name="slide-up" mode="out-in">
                       <span
                         id="additionalDeliveryAddress"
@@ -218,7 +226,7 @@ const props = defineProps({
   },
   hoverColor: {
     type: String,
-    default: '#660000'
+    default: '#660000',
   },
   font: {
     type: String,
@@ -271,12 +279,23 @@ const { oldPassword, newPassword, newPasswordRetype } = toRefs(passwords);
 const altEmail = ref(null);
 // handle errors
 const handleError = (errors) => {};
+//
+const setActionType = (type) => {
+  const formData = new FormData();
+  formData.append('action', type);
+  return formData;
+};
 // fetch user data
 const receivedData = ref([]);
 const getUserData = async () => {
-  const received = await useFetch(props.emailUrl, 'POST', {
-    action: 'load_data',
-  });
+  const received = await useFetch(
+    props.emailUrl,
+    'POST',
+    setActionType('load_data')
+  );
+  // const received = await useFetch(props.emailUrl, 'POST', {
+  //   action: 'load_data',
+  // });
   received.error.length
     ? handleError(received.errorMessage)
     : (receivedData.value = received);
@@ -287,31 +306,46 @@ const isEmail = ref(null);
 const togglePass = async () => {
   isPass.value = !isPass.value;
   if (isPass.value) {
-    await useFetch(props.credentialUrl, 'POST', {
-      action: 'edit',
-    });
+    await useFetch(props.credentialUrl, 'POST', setActionType('edit'));
   }
 };
 const toggleEmail = async () => {
   isEmail.value = !isEmail.value;
   if (isEmail.value) {
-    await useFetch(props.emailUrl, 'POST', {
-      action: 'edit',
-    });
+    await useFetch(props.emailUrl, 'POST', setActionType('edit'));
   }
 };
 // save data end-points calls
 const savePassword = async () => {
-  await useFetch(props.credentialUrl, 'POST', {
-    action: 'save',
-    ...passwords,
-  });
+  const formData = new FormData();
+  formData.append('action', 'save');
+  for (const [key, value] of Object.entries(passwords)) {
+    console.log(`${key}: ${value}`);
+    formData.append(key, value);
+  }
+  //formData.append('additionalDeliveryEmailAddress', altEmail.value);
+  const data = new URLSearchParams(formData);
+  const received = await useFetch(props.credentialUrl, 'POST', data);
+  if (received.error.length) {
+    const generalError = received.error.find(e => e.errorType === 'error')
+    if(generalError) showToast(generalError)
+    console.log("pass errors", received);
+  } else isPass.value = false
 };
 const saveAddress = async () => {
-  await useFetch(props.emailUrl, 'POST', {
-    action: 'save',
-    additionalDeliveryEmailAddress: altEmail.value,
-  });
+  const formData = new FormData();
+  formData.append('action', 'save');
+  formData.append('additionalDeliveryEmailAddress', altEmail.value);
+  const data = new URLSearchParams(formData);
+  const received = await useFetch(props.emailUrl, 'POST', data);
+  if (received.error.length) {
+    const generalError = received.error.find(e => e.errorType === 'error')
+    if(generalError) showToast(generalError)
+    console.log("pass errors", received);
+  } else {
+    getUserData()
+    isEmail.value = false
+  }
 };
 // // setting component state
 // const active = ref(false);
@@ -328,12 +362,12 @@ const saveAddress = async () => {
 // creating & emitting event for shownig toast
 const emit = defineEmits(['toggle-toast']);
 const accountWrapper = ref(null);
-const showToast = () => {
+const showToast = (msgs) => {
   accountWrapper.value.dispatchEvent(
     new CustomEvent('toggle-toast', {
       bubbles: true,
       composed: true,
-      detail: { error: 'eeee' },
+      detail: { messages: msgs.errorMessage },
     })
   );
 };
@@ -350,6 +384,7 @@ const showToast = () => {
 .stage {
   padding-bottom: 1.5rem;
   font-family: v-bind(props.font);
+  display: flex;
 }
 .stage__container {
   position: relative;

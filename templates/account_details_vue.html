@@ -1,7 +1,38 @@
 #set( $username = $session.getAttribute($constants.get('SESSION_KEY_REMOTE_USER')))
-<h2 class="site-title" hidden>$username</h2>
+<h2 class="site-title edit-btn" hidden>$username</h2>
 <custom-ebc></custom-ebc>
+<custom-toast is-active toast-data toast-style></custom-toast>
 <script async defer>
+// vue3 web component toast handling
+const toast = document.querySelector("custom-toast");
+const td = {}
+const ts = { position: "center", decoration: false, colorized: false, backdrop: false };
+toast.setAttribute("toast-style", JSON.stringify(ts));
+function showToast(msg, error = false) {
+  td.message = JSON.parse(JSON.stringify(msg))
+  if(error) {
+    const err = "$!{messages.get('shop.ebc.messages.error')}"
+    td.title = err
+    td.type = "error"
+  } else {
+    const suc = "$!{messages.get('shop.ebc.messages.success')}"
+    td.title = suc
+    td.type = "success"
+  } 
+  toast.setAttribute("toast-data", JSON.stringify(td));
+  toast.setAttribute("is-active", "true");
+}
+window.addEventListener("close-toast", toastClosed);
+function toastClosed() {
+  toast.setAttribute("is-active", "false");
+}
+
+window.addEventListener("toggle-toast", toggleToast);
+function toggleToast(e) {
+  showToast(e.detail.messages, true)
+  toast.setAttribute("is-active", "true");
+}
+
 const ebc = document.querySelector("custom-ebc");
 
 function setAttributes(el, attrs) {
@@ -13,6 +44,7 @@ function setAttributes(el, attrs) {
     el.setAttribute(key, attr);
   }
 }
+
 const ebcProps = {
   translations: {
     #foreach($resource in ${messages.getResourcesWithPrefix('shop.ebc.my_account')})
@@ -21,6 +53,7 @@ const ebcProps = {
   },
   user: document.querySelector('.site-title').innerText,
   "primary-color": getComputedStyle(document.querySelector('.site-title')).color,
+  "hover-color": getComputedStyle(document.querySelector('.edit-btn'), ":hover").color,
   font: getComputedStyle(document.querySelector('.site-title')).fontFamily,
   "email-url": "${link.getAction('/ajax/taxfreenoncashbenefit/email')}",
   "credential-url": "${link.getAction('/ajax/taxfreenoncashbenefit/credential')}"
