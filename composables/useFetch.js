@@ -10,7 +10,7 @@ export const useFetch = async (url, method, data = undefined) => {
       },
     });
     //console.log('success', response);
-    return { error: [], deliveryAddress: '', additionalDeliveryAddress: ''}
+    return { error: [], deliveryAddress: 'test@test.com', additionalDeliveryAddress: 'alt@test.com'}
     return response.json();
   } catch (error) {
     console.log("Error: ", error);

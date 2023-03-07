@@ -151,8 +151,9 @@
                     >
                       {{ translate('alternative_email') }}
                     </div>
+                    <div class="col-12 col-lg-4 font-weight-bold additional-email mt-3" v-else></div>
                   </Transition>
-                  <div class="col-12 col-lg-8 mt-3">
+                  <div class="col-12 col-lg-8 mt-3" :class="isEmail && !receivedData.deliveryAddress && 'no-email'">
                     <Transition name="slide-up" mode="out-in">
                       <span
                         id="additionalDeliveryAddress"
@@ -196,7 +197,7 @@
         </div>
       </div>
     </div>
-    <button @click="showToast">aa</button>
+    <!-- <button @click="showToast">aa</button> -->
   </section>
 </template>
 
@@ -214,6 +215,10 @@ const props = defineProps({
   primaryColor: {
     type: String,
     default: '#fff',
+  },
+  hoverColor: {
+    type: String,
+    default: '#660000'
   },
   font: {
     type: String,
@@ -607,7 +612,9 @@ svg {
 .address-data {
   width: 100%;
 }
-
+.no-email {
+  margin-top: -1.5rem !important;
+}
 .form-control {
   height: 3rem;
 }
@@ -624,8 +631,8 @@ svg {
 .btn-primary:not(:disabled):not(.disabled).active,
 .btn-primary:not(:disabled):not(.disabled):active,
 .show > .btn-primary.dropdown-toggle {
-  background-color: #660000;
-  border-color: #660000;
+  background-color: v-bind(props.hoverColor);
+  border-color: v-bind(props.hoverColor);
   outline: none;
   box-shadow: none;
   color: rgb(255, 255, 255);
@@ -643,7 +650,7 @@ svg {
   color: white;
 }
 .bi:hover {
-  fill: black;
+  fill: v-bind(props.hoverColor);
 }
 .fade-enter-active,
 .fade-leave-active {
