@@ -2,16 +2,16 @@
   <section class="stage" ref="accountWrapper">
     <div class="stage__container">
       <h2 class="my-4" :style="{ color: primaryColor }">
-        {{ translate('title') }}
+        {{ translate("title") }}
       </h2>
-      <p class="card-text">{{ translate('text') }}</p>
+      <p class="card-text">{{ translate("text") }}</p>
       <div class="row">
         <div class="col-sm-12 col-md-6 mb-3" ref="passRef">
           <div class="card stage__card voucher-overview">
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <h4 class="overview-title" @click="togglePass">
-                  {{ translate('access-data') }}
+                  {{ translate("access-data") }}
                 </h4>
                 <button @click="togglePass" class="edit-btn">
                   <svg
@@ -35,7 +35,7 @@
               <form id="password-form" @submit.prevent="savePassword">
                 <div class="row my-3">
                   <div class="col-12 col-lg-4 font-weight-bold">
-                    {{ translate('user-name') }}
+                    {{ translate("user-name") }}
                   </div>
                   <div class="col-12 col-lg-8">
                     {{ user }}
@@ -43,7 +43,7 @@
                 </div>
                 <div class="row my-3">
                   <div class="col-12 col-lg-4 font-weight-bold mt-3">
-                    {{ translate('password') }}
+                    {{ translate("password") }}
                   </div>
                   <div class="col-12 col-lg-8 mt-3">
                     <Transition name="slide-up" mode="out-in">
@@ -93,7 +93,7 @@
                           class="btn btn-primary account-data mb-3 disabled"
                           type="submit"
                         >
-                          {{ translate('save_changes') }}
+                          {{ translate("save_changes") }}
                         </button>
                       </div>
                     </Transition>
@@ -108,7 +108,7 @@
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <h4 class="overview-title">
-                  {{ translate('delivery-address') }}
+                  {{ translate("delivery-address") }}
                 </h4>
                 <button @click="toggleEmail" class="edit-btn">
                   <svg
@@ -132,14 +132,14 @@
               <form id="address-form" @submit.prevent="saveAddress">
                 <div class="row my-3">
                   <div class="col-12 col-lg-4 font-weight-bold">
-                    {{ translate('email') }}
+                    {{ translate("email") }}
                   </div>
                   <div
                     class="col-12 col-lg-8"
                     v-if="!isEmail || receivedData.deliveryAddress"
                   >
                     <span id="deliveryAddress">
-                      {{ receivedData.deliveryAddress || 'no email' }}
+                      {{ receivedData.deliveryAddress || "no email" }}
                     </span>
                   </div>
                 </div>
@@ -149,7 +149,7 @@
                       class="col-12 col-lg-4 font-weight-bold additional-email mt-3"
                       v-if="isAditionalEmail"
                     >
-                      {{ translate('alternative_email') }}
+                      {{ translate("alternative_email") }}
                     </div>
                     <div
                       class="col-12 col-lg-4 font-weight-bold additional-email mt-3"
@@ -175,7 +175,7 @@
                           id="additionalDeliveryEmailAddress"
                           class="additional-email address-data form-control"
                           type="email"
-                          v-model="altEmail"
+                          v-model="additionalDeliveryEmailAddress"
                           :placeholder="receivedData.additionalDeliveryAddress"
                           required
                         />
@@ -184,7 +184,7 @@
                           class="btn btn-primary mt-3 address-data disabled"
                           type="submit"
                         >
-                          {{ translate('send_to_alternative_email') }}
+                          {{ translate("send_to_alternative_email") }}
                         </button>
                         <button
                           id="delete-address"
@@ -193,7 +193,7 @@
                           type="submit"
                           v-if="receivedData.additionalDeliveryAddress"
                         >
-                          {{ translate('delete_alternative_email') }}
+                          {{ translate("delete_alternative_email") }}
                         </button>
                       </div>
                     </Transition>
@@ -210,10 +210,10 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, toRefs, watch, onMounted } from 'vue';
-import { useFetch } from '../composables/useFetch';
-import { resolveUrl } from '../utils/resolveUrl';
-import { useDetectOutsideClick } from '../composables/useDetectOutsideClick';
+import { ref, computed, reactive, toRefs, watch, onMounted } from "vue";
+import { useFetch } from "../composables/useFetch";
+import { resolveUrl } from "../utils/resolveUrl";
+import { useDetectOutsideClick } from "../composables/useDetectOutsideClick";
 
 // setting props
 const props = defineProps({
@@ -222,15 +222,15 @@ const props = defineProps({
   },
   primaryColor: {
     type: String,
-    default: '#fff',
+    default: "#fff",
   },
   hoverColor: {
     type: String,
-    default: '#660000',
+    default: "#660000",
   },
   font: {
     type: String,
-    default: '',
+    default: "",
   },
   user: {
     type: String,
@@ -244,7 +244,7 @@ const props = defineProps({
 });
 
 // return translations by keys
-const prefix = 'shop.ebc.my_account.';
+const prefix = "shop.ebc.my_account.";
 const translate = (key) => {
   return JSON.parse(props.translations)[prefix + key];
 };
@@ -269,20 +269,31 @@ const isAditionalEmail = computed(() => {
     receivedData.value.deliveryAddress
   );
 });
-
+// fields inputs
 const passwords = reactive({
   oldPassword: null,
   newPassword: null,
   newPasswordRetype: null,
 });
 const { oldPassword, newPassword, newPasswordRetype } = toRefs(passwords);
-const altEmail = ref(null);
+const emails = reactive({
+  additionalDeliveryEmailAddress: null,
+});
+const { additionalDeliveryEmailAddress } = toRefs(emails);
 // handle errors
-const handleError = (errors) => {};
-//
-const setActionType = (type) => {
+const handleError = (errors) => {
+  // TODO fields errors
+};
+// prepare data for ajax end-points calls
+const prepareFormData = (action, fields = null) => {
   const formData = new FormData();
-  formData.append('action', type);
+  formData.append("action", action);
+  if (fields) {
+    for (const [key, value] of Object.entries(fields)) {
+      formData.append(key, value);
+    }
+    return new URLSearchParams(formData);
+  }
   return formData;
 };
 // fetch user data
@@ -290,12 +301,9 @@ const receivedData = ref([]);
 const getUserData = async () => {
   const received = await useFetch(
     props.emailUrl,
-    'POST',
-    setActionType('load_data')
+    "POST",
+    prepareFormData("load_data")
   );
-  // const received = await useFetch(props.emailUrl, 'POST', {
-  //   action: 'load_data',
-  // });
   received.error.length
     ? handleError(received.errorMessage)
     : (receivedData.value = received);
@@ -306,45 +314,46 @@ const isEmail = ref(null);
 const togglePass = async () => {
   isPass.value = !isPass.value;
   if (isPass.value) {
-    await useFetch(props.credentialUrl, 'POST', setActionType('edit'));
+    await useFetch(props.credentialUrl, "POST", prepareFormData("edit"));
   }
 };
 const toggleEmail = async () => {
   isEmail.value = !isEmail.value;
   if (isEmail.value) {
-    await useFetch(props.emailUrl, 'POST', setActionType('edit'));
+    await useFetch(props.emailUrl, "POST", prepareFormData("edit"));
   }
 };
 // save data end-points calls
 const savePassword = async () => {
-  const formData = new FormData();
-  formData.append('action', 'save');
-  for (const [key, value] of Object.entries(passwords)) {
-    console.log(`${key}: ${value}`);
-    formData.append(key, value);
-  }
-  //formData.append('additionalDeliveryEmailAddress', altEmail.value);
-  const data = new URLSearchParams(formData);
-  const received = await useFetch(props.credentialUrl, 'POST', data);
+  const received = await useFetch(
+    props.credentialUrl,
+    "POST",
+    prepareFormData("save", passwords)
+  );
   if (received.error.length) {
-    const generalError = received.error.find(e => e.errorType === 'error')
-    if(generalError) showToast(generalError)
-    console.log("pass errors", received);
-  } else isPass.value = false
-};
-const saveAddress = async () => {
-  const formData = new FormData();
-  formData.append('action', 'save');
-  formData.append('additionalDeliveryEmailAddress', altEmail.value);
-  const data = new URLSearchParams(formData);
-  const received = await useFetch(props.emailUrl, 'POST', data);
-  if (received.error.length) {
-    const generalError = received.error.find(e => e.errorType === 'error')
-    if(generalError) showToast(generalError)
+    const generalError = received.error.find((e) => e.errorType === "error");
+    if (generalError) showToast(generalError);
     console.log("pass errors", received);
   } else {
-    getUserData()
-    isEmail.value = false
+    // TODO show success message
+    isPass.value = false;
+  }
+};
+const saveAddress = async () => {
+  const received = await useFetch(
+    props.emailUrl,
+    "POST",
+    prepareFormData("save", emails)
+  );
+  if (received.error.length) {
+    const generalError = received.error.find((e) => e.errorType === "error");
+    if (generalError) showToast(generalError);
+    console.log("email errors", received);
+  } else {
+    // TODO show success message
+    showToast()
+    getUserData();
+    isEmail.value = false;
   }
 };
 // // setting component state
@@ -359,12 +368,12 @@ const saveAddress = async () => {
 //     }
 //   }
 // );
-// creating & emitting event for shownig toast
-const emit = defineEmits(['toggle-toast']);
+// creating & emitting event for showing toast
+const emit = defineEmits(["toggle-toast"]);
 const accountWrapper = ref(null);
 const showToast = (msgs) => {
   accountWrapper.value.dispatchEvent(
-    new CustomEvent('toggle-toast', {
+    new CustomEvent("toggle-toast", {
       bubbles: true,
       composed: true,
       detail: { messages: msgs.errorMessage },
@@ -431,9 +440,9 @@ const showToast = (msgs) => {
   border-color: #dc3545;
   box-shadow: 0 0 0 0.2rem rgb(220 53 69 / 25%);
 }
-[type='button']:not(:disabled),
-[type='reset']:not(:disabled),
-[type='submit']:not(:disabled),
+[type="button"]:not(:disabled),
+[type="reset"]:not(:disabled),
+[type="submit"]:not(:disabled),
 button:not(:disabled) {
   cursor: pointer;
 }
