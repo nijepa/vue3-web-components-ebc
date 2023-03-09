@@ -44,6 +44,12 @@
                   <span id="ebc-password" class="account-data">
                     *********
                   </span>
+                  <!--<input id="oldPassword" name="oldPassword" class="account-data form-control d-none mb-3" required minlength="9" type="password" placeholder="$!{messages.get('shop.ebc.my_account.old_password')}">
+                  <p class="text-danger oldPassword" hidden >$!{messages.get('errors.shop.ebc.login.change_password.wrong_old_password')}</p>
+                  <input id="newPassword" name="newPassword" class="account-data form-control d-none mb-3" required minlength="9" type="password" placeholder="$!{messages.get('shop.ebc.my_account.new_password')}">
+                  <p class="text-danger newPassword" hidden>$!{messages.get('errors.password.violate_policy.tax_free_non_cash_benefit')}</p>
+                  <input id="newPasswordRetype" name="newPasswordRetype" class="account-data form-control d-none mb-3" required minlength="9" type="password" placeholder="$!{messages.get('shop.ebc.my_account.repeat_new_password')}">
+                  <p class="text-danger newPasswordRetype" hidden>$!{messages.get('errors.shop.ebc.login.change_password.passwords_not_equal')}</p>-->
                   <input id="oldPassword" name="oldPassword" class="account-data form-control d-none mb-3" required minlength="9" type="password" placeholder="$!{messages.get('shop.ebc.my_account.old_password')}">
                   <p class="text-danger oldPassword" hidden ></p>
                   <input id="newPassword" name="newPassword" class="account-data form-control d-none mb-3" required minlength="9" type="password" placeholder="$!{messages.get('shop.ebc.my_account.new_password')}">
@@ -97,32 +103,9 @@
       </div>
     </div>
   </div>
+<a data-link="welcome" href="${link.getTemplate("/shop/ebc/account_details_vue")}">*</a>
   <custom-toast is-active toast-data toast-style></custom-toast>
 </section>
-
-<script async defer>
-const ebc = document.querySelector("custom-ebc");
-
-function setAttributes(el, attrs) {
-  for (var key in attrs) {
-    const attr =
-      typeof attrs[key] !== "string"
-        ? JSON.stringify(attrs[key])
-        : attrs[key];
-    el.setAttribute(key, attr);
-  }
-}
-const ebcProps = {
-  translations: {
-    #foreach($resource in ${messages.getResourcesWithPrefix('shop.ebc.my_account')})
-      '$!{resource.getKey()}': '$!{resource.getValue().replace("'", "")}',
-    #end
-  },
-  "primary-color": getComputedStyle(document.querySelector('.site-title')).color,
-  font: getComputedStyle(document.querySelector('.site-title')).fontFamily,
-      };
-  setAttributes(ebc, ebcProps);
-</script>
 
 <script>
 // vue3 web component toast handling
@@ -352,6 +335,7 @@ function saveAddressAction(event){
     },
     dataType: "html",
     success: function(data){
+console.log(5,data)
       jQuery("#additionalDeliveryAddress").html(JSON.parse(data).additionalDeliveryAddress)
       jQuery("#submit-address").addClass("disabled");
       jQuery("#submit-address").prop("disabled", true);

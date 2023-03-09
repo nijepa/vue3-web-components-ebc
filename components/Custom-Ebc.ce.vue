@@ -2,16 +2,16 @@
   <section class="stage" ref="accountWrapper">
     <div class="stage__container">
       <h2 class="my-4" :style="{ color: primaryColor }">
-        {{ translate("title") }}
+        {{ translate('title') }}
       </h2>
-      <p class="card-text">{{ translate("text") }}</p>
+      <p class="card-text">{{ translate('text') }}</p>
       <div class="row">
         <div class="col-sm-12 col-md-6 mb-3" ref="passRef">
           <div class="card stage__card voucher-overview">
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <h4 class="overview-title" @click="togglePass">
-                  {{ translate("access-data") }}
+                  {{ translate('access-data') }}
                 </h4>
                 <button @click="togglePass" class="edit-btn">
                   <svg
@@ -35,15 +35,15 @@
               <form id="password-form" @submit.prevent="savePassword">
                 <div class="row my-3">
                   <div class="col-12 col-lg-4 font-weight-bold">
-                    {{ translate("user-name") }}
+                    {{ translate('user-name') }}
                   </div>
                   <div class="col-12 col-lg-8">
-                    {{ user }}
+                    {{ receivedData?.username }}
                   </div>
                 </div>
                 <div class="row my-3">
                   <div class="col-12 col-lg-4 font-weight-bold mt-3">
-                    {{ translate("password") }}
+                    {{ translate('password') }}
                   </div>
                   <div class="col-12 col-lg-8 mt-3">
                     <Transition name="slide-up" mode="out-in">
@@ -55,45 +55,75 @@
                         *********
                       </span>
                       <div class="" v-else>
-                        <input
-                          v-model="oldPassword"
-                          id="oldPassword"
-                          name="oldPassword"
-                          class="account-data form-control mb-3"
-                          required
-                          minlength="9"
-                          type="password"
-                          :placeholder="translate('old_password')"
-                        />
-                        <p class="text-danger oldPassword" hidden>yy</p>
-                        <input
-                          v-model="newPassword"
-                          id="newPassword"
-                          name="newPassword"
-                          class="account-data form-control mb-3"
-                          required
-                          minlength="9"
-                          type="password"
-                          :placeholder="translate('new_password')"
-                        />
-                        <p class="text-danger newPassword" hidden></p>
-                        <input
-                          v-model="newPasswordRetype"
-                          id="newPasswordRetype"
-                          name="newPasswordRetype"
-                          class="account-data form-control mb-3"
-                          required
-                          minlength="9"
-                          type="password"
-                          :placeholder="translate('repeat_new_password')"
-                        />
-                        <p class="text-danger newPasswordRetype" hidden></p>
+                        <div
+                          v-for="(pass, propertyName, i) in passwords"
+                          :key="i"
+                        >
+                          <div
+                            class="d-flex mb-3"
+                            style="align-items: center; column-gap: 0.5rem"
+                          >
+                            <input
+                              v-model="passwords[propertyName]"
+                              class="account-data form-control"
+                              required
+                              minlength="9"
+                              :type="fieldsInfo[i].fieldType"
+                              :placeholder="fieldsInfo[i].placeholder"
+                              :class="errors[propertyName] && 'is-invalid'"
+                              :title="fieldsInfo[i].placeholder"
+                              @focus="errors[propertyName] = null"
+                            />
+                            <svg
+                              width="32px"
+                              height="32px"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                              class="eye"
+                              @click="toogleFieldType(i)"
+                              v-if="fieldsInfo[i].fieldType === 'password'"
+                            >
+                              <path
+                                d="M20.69 11.7C20.57 11.44 17.83 5.25 12 5.25C11.4418 5.24942 10.8851 5.30977 10.34 5.43C10.1604 5.48559 10.0083 5.60656 9.91369 5.76899C9.81908 5.93141 9.78892 6.12343 9.82916 6.30704C9.8694 6.49064 9.97712 6.65244 10.131 6.76041C10.2849 6.86837 10.4736 6.91462 10.66 6.89C11.1007 6.79789 11.5497 6.75098 12 6.75C16.18 6.75 18.58 10.85 19.17 12C18.8103 12.7028 18.3886 13.3721 17.91 14C17.824 14.1107 17.7708 14.2433 17.7564 14.3827C17.7419 14.5221 17.7668 14.6627 17.8282 14.7887C17.8897 14.9147 17.9851 15.0209 18.1039 15.0954C18.2226 15.1699 18.3598 15.2096 18.5 15.21C18.6139 15.2096 18.7262 15.1833 18.8285 15.1331C18.9307 15.0828 19.0201 15.01 19.09 14.92C19.7198 14.1202 20.2566 13.2512 20.69 12.33C20.7338 12.2308 20.7564 12.1235 20.7564 12.015C20.7564 11.9065 20.7338 11.7992 20.69 11.7Z"
+                                fill="#000000"
+                              />
+                              <path
+                                d="M6.52999 5.47003C6.38781 5.33755 6.19976 5.26543 6.00546 5.26885C5.81116 5.27228 5.62578 5.35099 5.48836 5.48841C5.35095 5.62582 5.27224 5.81121 5.26881 6.00551C5.26538 6.19981 5.33751 6.38785 5.46999 6.53003L6.38999 7.45003C5.08727 8.64844 4.03971 10.0973 3.30999 11.71C3.27066 11.8034 3.2504 11.9037 3.2504 12.005C3.2504 12.1064 3.27066 12.2067 3.30999 12.3C3.42999 12.56 6.16999 18.75 12 18.75C13.5593 18.7577 15.0863 18.3056 16.39 17.45L17.47 18.53C17.6106 18.6705 17.8012 18.7494 18 18.7494C18.1987 18.7494 18.3894 18.6705 18.53 18.53C18.6704 18.3894 18.7493 18.1988 18.7493 18C18.7493 17.8013 18.6704 17.6107 18.53 17.47L6.52999 5.47003ZM10.36 11.47L12.57 13.69C12.2603 13.7927 11.9285 13.8097 11.6099 13.7393C11.2913 13.6689 10.9976 13.5137 10.76 13.29C10.518 13.0514 10.3511 12.7472 10.2801 12.4149C10.209 12.0826 10.2368 11.7367 10.36 11.42V11.47ZM12 17.25C7.80999 17.25 5.41999 13.14 4.82999 12C5.48267 10.6863 6.37068 9.50345 7.44999 8.51003L9.23999 10.3C8.85581 10.9209 8.69263 11.6534 8.7769 12.3787C8.86116 13.104 9.18793 13.7795 9.70422 14.2958C10.2205 14.8121 10.8961 15.1389 11.6213 15.2231C12.3466 15.3074 13.0791 15.1442 13.7 14.76L15.31 16.37C14.3052 16.954 13.1622 17.2579 12 17.25Z"
+                                fill="#000000"
+                              />
+                            </svg>
+                            <svg
+                              width="32px"
+                              height="32px"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                              class="eye"
+                              @click="toogleFieldType(i)"
+                              v-if="fieldsInfo[i].fieldType === 'text'"
+                            >
+                              <path
+                                d="M12 18.75C6.17 18.75 3.43 12.56 3.31 12.3C3.27039 12.2049 3.25 12.103 3.25 12C3.25 11.897 3.27039 11.7951 3.31 11.7C3.43 11.44 6.17 5.25 12 5.25C17.83 5.25 20.57 11.44 20.69 11.7C20.7296 11.7951 20.75 11.897 20.75 12C20.75 12.103 20.7296 12.2049 20.69 12.3C20.57 12.56 17.83 18.75 12 18.75ZM4.83 12C5.42 13.15 7.83 17.25 12 17.25C16.17 17.25 18.58 13.15 19.17 12C18.58 10.85 16.17 6.75 12 6.75C7.83 6.75 5.42 10.85 4.83 12Z"
+                                fill="#000000"
+                              />
+                              <path
+                                d="M12 15.25C11.3572 15.25 10.7289 15.0594 10.1944 14.7023C9.65994 14.3452 9.24338 13.8376 8.99739 13.2437C8.75141 12.6499 8.68705 11.9964 8.81245 11.366C8.93785 10.7355 9.24738 10.1564 9.7019 9.7019C10.1564 9.24738 10.7355 8.93785 11.366 8.81245C11.9964 8.68705 12.6499 8.75141 13.2437 8.99739C13.8376 9.24338 14.3452 9.65994 14.7023 10.1944C15.0594 10.7289 15.25 11.3572 15.25 12C15.2474 12.8611 14.9041 13.6863 14.2952 14.2952C13.6863 14.9041 12.8611 15.2474 12 15.25ZM12 10.25C11.6539 10.25 11.3155 10.3526 11.0278 10.5449C10.74 10.7372 10.5157 11.0105 10.3832 11.3303C10.2508 11.6501 10.2161 12.0019 10.2836 12.3414C10.3512 12.6809 10.5178 12.9927 10.7626 13.2374C11.0073 13.4822 11.3191 13.6489 11.6586 13.7164C11.9981 13.7839 12.3499 13.7492 12.6697 13.6168C12.9895 13.4843 13.2628 13.26 13.4551 12.9722C13.6474 12.6845 13.75 12.3461 13.75 12C13.7474 11.5367 13.5622 11.0931 13.2345 10.7655C12.9069 10.4378 12.4633 10.2526 12 10.25Z"
+                                fill="#000000"
+                              />
+                            </svg>
+                          </div>
+                          <p
+                            v-if="errors[propertyName]"
+                            class="text-danger"
+                            v-html="errors[propertyName]"
+                          ></p>
+                        </div>
                         <button
-                          id="submit-changed-password"
                           class="btn btn-primary account-data mb-3 disabled"
                           type="submit"
                         >
-                          {{ translate("save_changes") }}
+                          {{ translate('save_changes') }}
                         </button>
                       </div>
                     </Transition>
@@ -108,7 +138,7 @@
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <h4 class="overview-title">
-                  {{ translate("delivery-address") }}
+                  {{ translate('delivery-address') }}
                 </h4>
                 <button @click="toggleEmail" class="edit-btn">
                   <svg
@@ -132,14 +162,18 @@
               <form id="address-form" @submit.prevent="saveAddress">
                 <div class="row my-3">
                   <div class="col-12 col-lg-4 font-weight-bold">
-                    {{ translate("email") }}
+                    {{ translate('email') }}
                   </div>
                   <div
                     class="col-12 col-lg-8"
-                    v-if="!isEmail || receivedData.deliveryAddress"
+                    v-if="
+                      !isEmail ||
+                      receivedData.deliveryAddress ||
+                      receivedData.emailAddress
+                    "
                   >
                     <span id="deliveryAddress">
-                      {{ receivedData.deliveryAddress || "no email" }}
+                      {{ showEmail }}
                     </span>
                   </div>
                 </div>
@@ -149,7 +183,7 @@
                       class="col-12 col-lg-4 font-weight-bold additional-email mt-3"
                       v-if="isAditionalEmail"
                     >
-                      {{ translate("alternative_email") }}
+                      {{ translate('alternative_email') }}
                     </div>
                     <div
                       class="col-12 col-lg-4 font-weight-bold additional-email mt-3"
@@ -164,7 +198,6 @@
                   >
                     <Transition name="slide-up" mode="out-in">
                       <span
-                        id="additionalDeliveryAddress"
                         class="address-data"
                         v-if="!isEmail"
                       >
@@ -172,28 +205,28 @@
                       </span>
                       <div class="" v-else>
                         <input
-                          id="additionalDeliveryEmailAddress"
                           class="additional-email address-data form-control"
                           type="email"
-                          v-model="additionalDeliveryEmailAddress"
-                          :placeholder="receivedData.additionalDeliveryAddress"
+                          v-model="emailAddress"
+                          :placeholder="
+                            receivedData.additionalDeliveryAddress ||
+                            receivedData.emailAddress
+                          "
                           required
                         />
                         <button
-                          id="submit-address"
                           class="btn btn-primary mt-3 address-data disabled"
                           type="submit"
                         >
-                          {{ translate("send_to_alternative_email") }}
+                          {{ getButtonText(true) }}
                         </button>
                         <button
-                          id="delete-address"
-                          onclick="deleteAddressAction(event)"
+                          @click.prevent="deleteAddress"
                           class="btn btn-outline product-btn mt-3 address-data disabled"
                           type="submit"
-                          v-if="receivedData.additionalDeliveryAddress"
+                          v-if="hasDeleteButton"
                         >
-                          {{ translate("delete_alternative_email") }}
+                          {{ getButtonText() }}
                         </button>
                       </div>
                     </Transition>
@@ -205,15 +238,14 @@
         </div>
       </div>
     </div>
-    <!-- <button @click="showToast">aa</button> -->
   </section>
 </template>
 
 <script setup>
-import { ref, computed, reactive, toRefs, watch, onMounted } from "vue";
-import { useFetch } from "../composables/useFetch";
-import { resolveUrl } from "../utils/resolveUrl";
-import { useDetectOutsideClick } from "../composables/useDetectOutsideClick";
+import { ref, computed, reactive, toRefs, watch, onMounted } from 'vue';
+import { useFetch } from '../composables/useFetch';
+import { resolveUrl } from '../utils/resolveUrl';
+import { useDetectOutsideClick } from '../composables/useDetectOutsideClick';
 
 // setting props
 const props = defineProps({
@@ -222,15 +254,15 @@ const props = defineProps({
   },
   primaryColor: {
     type: String,
-    default: "#fff",
+    default: '#fff',
   },
   hoverColor: {
     type: String,
-    default: "#660000",
+    default: '#660000',
   },
   font: {
     type: String,
-    default: "",
+    default: '',
   },
   user: {
     type: String,
@@ -238,16 +270,63 @@ const props = defineProps({
   emailUrl: {
     type: String,
   },
+  noEmailUrl: {
+    type: String,
+  },
   credentialUrl: {
     type: String,
   },
+  logout: {
+    type: String,
+  },
 });
-
+const toogleFieldType = (i) => {
+  fieldsInfo[i].fieldType =
+    fieldsInfo[i].fieldType === 'password' ? 'text' : 'password';
+};
+const getButtonText = (type = false) => {
+  if (type) {
+    return isEmailMandatory.value
+      ? translate('send_to_alternative_email')
+      : translate('save_email');
+  }
+  return isEmailMandatory.value
+    ? translate('delete_alternative_email')
+    : translate('delete_email');
+};
+const hasDeleteButton = computed(() => {
+  return isEmailMandatory.value
+    ? receivedData.value.additionalDeliveryAddress
+    : receivedData.value.emailAddress;
+});
+const showEmail = computed(() => {
+  return (
+    receivedData.value.deliveryAddress ||
+    receivedData.value.emailAddress ||
+    translate('no_email')
+  );
+});
 // return translations by keys
-const prefix = "shop.ebc.my_account.";
+const prefix = 'shop.ebc.my_account.';
 const translate = (key) => {
   return JSON.parse(props.translations)[prefix + key];
 };
+
+const fieldsInfo = reactive([
+  {
+    fieldType: 'password',
+    placeholder: translate('old_password'),
+  },
+  {
+    fieldType: 'password',
+    placeholder: translate('new_password'),
+  },
+  {
+    fieldType: 'password',
+    placeholder: translate('repeat_new_password'),
+  },
+]);
+
 // handle click outside
 const passRef = ref();
 const emailRef = ref();
@@ -278,16 +357,39 @@ const passwords = reactive({
 const { oldPassword, newPassword, newPasswordRetype } = toRefs(passwords);
 const emails = reactive({
   additionalDeliveryEmailAddress: null,
+  emailAddress: null,
 });
 const { additionalDeliveryEmailAddress } = toRefs(emails);
 // handle errors
-const handleError = (errors) => {
-  // TODO fields errors
+const errors = reactive({
+  oldPassword: null,
+  newPassword: null,
+  newPasswordRetype: null,
+});
+const handleFieldErrors = (err) => {
+  const fieldErrors = err.filter((e) => {
+    return e.errorType === 'FieldError';
+  });
+  if (fieldErrors.length) {
+    fieldErrors.forEach((f) => {
+      errors[f.errorField] = f.errorMessage;
+    });
+  }
+};
+const handleGeneralError = (err) => {
+  const generalError = err.find((e) => e.errorType === 'error');
+  if (generalError) showToast(generalError.errorMessage);
+};
+const clearFieldErrors = () => {
+  Object.keys(errors).forEach((key) => {
+    errors[key] = null;
+  });
 };
 // prepare data for ajax end-points calls
 const prepareFormData = (action, fields = null) => {
   const formData = new FormData();
-  formData.append("action", action);
+  console.log(fields);
+  formData.append('action', action);
   if (fields) {
     for (const [key, value] of Object.entries(fields)) {
       formData.append(key, value);
@@ -297,62 +399,109 @@ const prepareFormData = (action, fields = null) => {
   return formData;
 };
 // fetch user data
-const receivedData = ref([]);
+const receivedData = ref({});
+const isEmailMandatory = ref(null);
+const emailUrl = ref(null);
 const getUserData = async () => {
-  const received = await useFetch(
-    props.emailUrl,
-    "POST",
-    prepareFormData("load_data")
+  const userData = await useFetch(
+    props.credentialUrl,
+    'POST',
+    prepareFormData('edit')
   );
-  received.error.length
-    ? handleError(received.errorMessage)
-    : (receivedData.value = received);
+  userData.error.length
+    ? handleGeneralError(userData.error)
+    : (isEmailMandatory.value = userData.emailMandatory);
+
+  emailUrl.value = isEmailMandatory.value ? props.emailUrl : props.noEmailUrl;
+  const emailData = await useFetch(
+    emailUrl.value,
+    'POST',
+    prepareFormData('edit')
+  );
+  emailData.error.length
+    ? handleGeneralError(emailData.error)
+    : (receivedData.value = emailData);
+};
+const emailAddress = computed({
+  get() {
+    return isEmailMandatory.value
+      ? emails.additionalDeliveryEmailAddress
+      : emails.emailAddress;
+  },
+  set(value) {
+    if (isEmailMandatory.value) {
+      emails.additionalDeliveryEmailAddress = value;
+    } else {
+      emails.emailAddress = value;
+    }
+  },
+});
+const getEmailKey = (value) => {
+  console.log(value, Object.keys(emails));
+  return Object.keys(emails).find((k) => emails[k] === value);
 };
 // handle forms states
 const isPass = ref(null);
 const isEmail = ref(null);
 const togglePass = async () => {
   isPass.value = !isPass.value;
-  if (isPass.value) {
-    await useFetch(props.credentialUrl, "POST", prepareFormData("edit"));
-  }
+  clearFieldErrors();
 };
 const toggleEmail = async () => {
   isEmail.value = !isEmail.value;
-  if (isEmail.value) {
-    await useFetch(props.emailUrl, "POST", prepareFormData("edit"));
-  }
 };
 // save data end-points calls
 const savePassword = async () => {
   const received = await useFetch(
     props.credentialUrl,
-    "POST",
-    prepareFormData("save", passwords)
+    'POST',
+    prepareFormData('save', passwords)
   );
   if (received.error.length) {
-    const generalError = received.error.find((e) => e.errorType === "error");
-    if (generalError) showToast(generalError);
-    console.log("pass errors", received);
+    handleFieldErrors(received.error);
+    console.log('pass errors', received);
   } else {
-    // TODO show success message
+    showToast(translate('save.success'), false);
+    Object.keys(passwords).forEach((key) => {
+      passwords[key] = null;
+    });
     isPass.value = false;
+    useFetch(props.logout, 'POST');
   }
 };
 const saveAddress = async () => {
   const received = await useFetch(
-    props.emailUrl,
-    "POST",
-    prepareFormData("save", emails)
+    emailUrl.value,
+    'POST',
+    prepareFormData('save', {
+      [getEmailKey(emailAddress.value)]: emailAddress.value,
+    })
   );
   if (received.error.length) {
-    const generalError = received.error.find((e) => e.errorType === "error");
-    if (generalError) showToast(generalError);
-    console.log("email errors", received);
+    handleGeneralError(received.error);
+    // const generalError = received.error.find((e) => e.errorType === "error");
+    // if (generalError) showToast(generalError.errorMessage);
+    console.log('email errors', received);
   } else {
-    // TODO show success message
-    showToast()
+    showToast(translate('save.success'), false);
     getUserData();
+    emailAddress.value = null;
+    isEmail.value = false;
+  }
+};
+const deleteAddress = async () => {
+  const received = await useFetch(
+    emailUrl.value,
+    'POST',
+    prepareFormData('delete')
+  );
+  if (received.error.length) {
+    handleGeneralError(received.error);
+    console.log('delete email error', received);
+  } else {
+    showToast(translate('delete.success'), false);
+    getUserData();
+    emails.additionalDeliveryEmailAddress = null;
     isEmail.value = false;
   }
 };
@@ -369,14 +518,14 @@ const saveAddress = async () => {
 //   }
 // );
 // creating & emitting event for showing toast
-const emit = defineEmits(["toggle-toast"]);
+const emit = defineEmits(['toggle-toast']);
 const accountWrapper = ref(null);
-const showToast = (msgs) => {
+const showToast = (msg, type = true) => {
   accountWrapper.value.dispatchEvent(
-    new CustomEvent("toggle-toast", {
+    new CustomEvent('toggle-toast', {
       bubbles: true,
       composed: true,
-      detail: { messages: msgs.errorMessage },
+      detail: { messages: msg, type: type },
     })
   );
 };
@@ -440,9 +589,9 @@ const showToast = (msgs) => {
   border-color: #dc3545;
   box-shadow: 0 0 0 0.2rem rgb(220 53 69 / 25%);
 }
-[type="button"]:not(:disabled),
-[type="reset"]:not(:disabled),
-[type="submit"]:not(:disabled),
+[type='button']:not(:disabled),
+[type='reset']:not(:disabled),
+[type='submit']:not(:disabled),
 button:not(:disabled) {
   cursor: pointer;
 }
@@ -641,7 +790,7 @@ svg {
     border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 .btn {
-  letter-spacing: -0.0125rem;
+  letter-spacing: -0.015rem;
   padding: 0.75rem;
   font-weight: 600;
   border-radius: 0.5rem;
@@ -695,6 +844,17 @@ svg {
 }
 .bi:hover {
   fill: v-bind(props.hoverColor);
+}
+.text-danger {
+  color: #dc3545 !important;
+}
+.eye {
+  cursor: pointer;
+  stroke: v-bind(props.primaryColor);
+  /* stroke-width: .2; */
+}
+.eye:hover {
+  stroke: v-bind(props.hoverColor);
 }
 .fade-enter-active,
 .fade-leave-active {

@@ -1,6 +1,9 @@
 #set( $username = $session.getAttribute($constants.get('SESSION_KEY_REMOTE_USER')))
-<h2 class="site-title edit-btn" hidden>$username</h2>
+<h2 class="site-title" hidden>$username</h2>
+<div class="hover-color"></div>
+<div>
 <custom-ebc></custom-ebc>
+</div>
 <custom-toast is-active toast-data toast-style></custom-toast>
 <script async defer>
 // vue3 web component toast handling
@@ -29,7 +32,8 @@ function toastClosed() {
 
 window.addEventListener("toggle-toast", toggleToast);
 function toggleToast(e) {
-  showToast(e.detail.messages, true)
+console.log(7, e.detail)
+  showToast(e.detail.messages, e.detail.type)
   toast.setAttribute("is-active", "true");
 }
 
@@ -53,9 +57,10 @@ const ebcProps = {
   },
   user: document.querySelector('.site-title').innerText,
   "primary-color": getComputedStyle(document.querySelector('.site-title')).color,
-  "hover-color": getComputedStyle(document.querySelector('.edit-btn'), ":hover").color,
+  "hover-color": getComputedStyle(document.querySelector('.hover-color')).color,
   font: getComputedStyle(document.querySelector('.site-title')).fontFamily,
   "email-url": "${link.getAction('/ajax/taxfreenoncashbenefit/email')}",
+  "no-email-url": "${link.getAction('/ajax/taxfreenoncashbenefit/email/login')}",
   "credential-url": "${link.getAction('/ajax/taxfreenoncashbenefit/credential')}"
 };
 setAttributes(ebc, ebcProps);
