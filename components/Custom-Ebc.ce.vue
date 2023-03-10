@@ -451,12 +451,12 @@ const savePassword = async () => {
     handleFieldErrors(received.error);
     console.log('pass errors', received);
   } else {
-    showToast(translate('save.success'), false);
+    showToast(translate('save.success'), false, true);
     Object.keys(passwords).forEach((key) => {
       passwords[key] = null;
     });
     isPass.value = false;
-    useFetch(props.logout, 'POST');
+    // useFetch(props.logout, 'POST');
   }
 };
 const saveAddress = async () => {
@@ -508,12 +508,12 @@ const deleteAddress = async () => {
 // creating & emitting event for showing toast
 const emit = defineEmits(['toggle-toast']);
 const accountWrapper = ref(null);
-const showToast = (msg, type = true) => {
+const showToast = (msg, type = true, fixed = false) => {
   accountWrapper.value.dispatchEvent(
     new CustomEvent('toggle-toast', {
       bubbles: true,
       composed: true,
-      detail: { messages: msg, type: type },
+      detail: { messages: msg, type: type, fixed },
     })
   );
 };
