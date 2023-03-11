@@ -1,0 +1,8 @@
+.footer {
+#if( "$!footer_background_color" != "" )
+  background-color: $footer_background_color;
+#else
+  background-color: rgb($white);
+#end
+  margin-top: auto;
+}

@@ -11,7 +11,7 @@ const toast = document.querySelector("custom-toast");
 const td = {}
 const ts = { position: "center", decoration: false, colorized: false, backdrop: false };
 toast.setAttribute("toast-style", JSON.stringify(ts));
-function showToast(msg, error = false) {
+function showToast(msg, error = false, fixed = false) {
   td.message = JSON.parse(JSON.stringify(msg))
   if(error) {
     const err = "$!{messages.get('shop.ebc.messages.error')}"
@@ -22,6 +22,10 @@ function showToast(msg, error = false) {
     td.title = suc
     td.type = "success"
   } 
+  if(fixed) {
+    toast.setAttribute("fixed", JSON.stringify(fixed))
+    toast.setAttribute("logout-url", JSON.stringify(ebcProps.logout))
+  }
   toast.setAttribute("toast-data", JSON.stringify(td));
   toast.setAttribute("is-active", "true");
 }
@@ -32,8 +36,7 @@ function toastClosed() {
 
 window.addEventListener("toggle-toast", toggleToast);
 function toggleToast(e) {
-console.log(7, e.detail)
-  showToast(e.detail.messages, e.detail.type)
+  showToast(e.detail.messages, e.detail.type, e.detail.fixed)
   toast.setAttribute("is-active", "true");
 }
 
@@ -61,7 +64,8 @@ const ebcProps = {
   font: getComputedStyle(document.querySelector('.site-title')).fontFamily,
   "email-url": "${link.getAction('/ajax/taxfreenoncashbenefit/email')}",
   "no-email-url": "${link.getAction('/ajax/taxfreenoncashbenefit/email/login')}",
-  "credential-url": "${link.getAction('/ajax/taxfreenoncashbenefit/credential')}"
+  "credential-url": "${link.getAction('/ajax/taxfreenoncashbenefit/credential')}",
+  "logout": "${link.getAction("/taxfreenoncashbenefit/logout")}"
 };
 setAttributes(ebc, ebcProps);
 </script>

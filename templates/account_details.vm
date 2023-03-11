@@ -1,0 +1,7 @@
+.hover-color {
+#if( "$!primary_dark_custom" != "" )
+  color: $primary_dark_custom;
+#else
+  color: rgb($primary_dark);
+#end
+}
