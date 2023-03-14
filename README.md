@@ -1,6 +1,6 @@
 # custom-search
 
-## Vite, Vue3 web-component *`custom-search`*
+## Vite, Vue3 web-component *`custom-ebc`*
 
 (standalone web component made with Vue3 & Vite)
 
@@ -13,62 +13,57 @@
 #### in HTML header in `structure.vm` velocity template
 
 ```html
-  <script type="module" crossorigin src="/scripts/path/to/search.js"></script>
+  <script type="module" crossorigin src="/scripts/path/to/ebc.js"></script>
 ```
 
 ### Place component
 
-#### in velocity template `header.vm`
+#### in velocity template `account_details.vm`
 
 ```html
-  <custom-search />
+  <custom-ebc></custom-ebc>
 ```
 
 ## Interacting with component
 
-### Script for *emmiting/listening* event *to/from* component and getting required translations, app context name:
+### Script for getting required translations & styles and *listening* to event:
 
 ```js
   <script async defer>
-    const search = document.querySelector("custom-search");
-    const showSearch = () => {
-      search.setAttribute("is-active", "true");
-    };
-    const searchClosed = () => {
-      search.setAttribute("is-active", "false");
-    };
-    window.addEventListener("close-search", searchClosed);
-    const msgs = {
-      empty: "$!{messages.get('incentivemall.productoverview.empty')}",
-      placeholder: "$!{messages.get('incentivemall.productoverview.search')}"
+    const ebc = document.querySelector("custom-ebc");
+    function setAttributes(el, attrs) {
+      for (var key in attrs) {
+        const attr =
+          typeof attrs[key] !== "string"
+            ? JSON.stringify(attrs[key])
+            : attrs[key];
+        el.setAttribute(key, attr);
+      }
     }
-    search.setAttribute("translations", JSON.stringify(msgs))
-    search.setAttribute("context", "$request.getContextPath()")
+    const ebcProps = {
+      translations: {
+        #foreach($resource in ${messages.getResourcesWithPrefix('shop.ebc.my_account')})
+          '$!{resource.getKey()}': '$!{resource.getValue().replace("'", "")}',
+        #end
+      },
+      "primary-color": getComputedStyle(document.querySelector('.site-title')).color,
+      "hover-color": getComputedStyle(document.querySelector('.hover-color')).color,
+      font: getComputedStyle(document.querySelector('.site-title')).fontFamily,
+      "action-url": "${link.getAction('/ajax/taxfreenoncashbenefit/email')}"
+    };
+    setAttributes(ebc, ebcProps);
+    window.addEventListener("toggle-toast", toggleToast);
+    function toggleToast(e) {
+      showToast(e.detail.messages, e.detail.type, e.detail.fixed)
+    }
   </script>
-```
-
-### Header navbar elemet with search icon to init component:
-
-```html
-  <li class="nav-item d-flex align-items-center" onclick="showSearch()">  
-    <svg id="search" class="search__icon svg-icon ml-0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" version="1.1"><use xlink:href="/images/icons/all_in_one.svg#search"></use></svg>
-  </li>
 ```
 
 <hr>
 
 ### Props
 
-- #### ***Used for component state (show/hide):***
-
-  ### **`isActive`**
-
-    - Type: String
-    - Default: 'false'
-
-<br/>
-
-- #### ***Used for text resources (recived from velocity template as object, need to use `JSON.parse`):***
+- #### ***Translations are recived from velocity action as object, need to use JSON.parse:***
 
   ### **`translations`**
 
@@ -76,19 +71,35 @@
 
 <br/>
 
-- #### ***Used for API call and generation of links to outer pages:***
+- #### ***Styles are received from site elements:***
 
-  ### **`context`**
+  ### **`primaryColor`**
 
     - Type: String
-    - Default: '/mall'
+
+  ### **`hoverColor`**
+
+    - Type: String
+
+  ### **`font`**
+
+    - Type: String
+
+<br/>
+
+- #### ***Action url are received from velocity action:***
+
+  ### **`actionUrl`**
+
+    - Type: String
+    - Default: ''
 
 <hr>
 
 ## Deployment
 
-- build app 
-- rename compiled file to **`search.js`**
+- build app
+- rename compiled file to **`ebc.js`**
 - upload file to **`Doocroot-Explorer -> scripts/path/for/app`**
 
 <hr>

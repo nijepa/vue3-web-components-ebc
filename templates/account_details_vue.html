@@ -1,71 +1,63 @@
 #set( $username = $session.getAttribute($constants.get('SESSION_KEY_REMOTE_USER')))
 <h2 class="site-title" hidden>$username</h2>
-<div class="hover-color"></div>
-<div>
+<div class="hover-color" hidden></div>
 <custom-ebc></custom-ebc>
-</div>
-<custom-toast is-active toast-data toast-style></custom-toast>
+<custom-toast></custom-toast>
 <script async defer>
-// vue3 web component toast handling
-const toast = document.querySelector("custom-toast");
-const td = {}
-const ts = { position: "center", decoration: false, colorized: false, backdrop: false };
-toast.setAttribute("toast-style", JSON.stringify(ts));
-function showToast(msg, error = false, fixed = false) {
-  td.message = JSON.parse(JSON.stringify(msg))
-  if(error) {
-    const err = "$!{messages.get('shop.ebc.messages.error')}"
-    td.title = err
-    td.type = "error"
-  } else {
-    const suc = "$!{messages.get('shop.ebc.messages.success')}"
-    td.title = suc
-    td.type = "success"
-  } 
-  if(fixed) {
-    toast.setAttribute("fixed", JSON.stringify(fixed))
-    toast.setAttribute("logout-url", JSON.stringify(ebcProps.logout))
+  // vue3 web component toast handling
+  const toast = document.querySelector("custom-toast");
+  const td = {}
+  // const ts = { position: "center", decoration: false, colorized: false, backdrop: false };
+  // toast.setAttribute("toast-style", JSON.stringify(ts));
+  const messages = {
+    success: "$!{messages.get('shop.ebc.messages.success')}",
+    error: "$!{messages.get('shop.ebc.messages.error')}"
   }
-  toast.setAttribute("toast-data", JSON.stringify(td));
-  toast.setAttribute("is-active", "true");
-}
-window.addEventListener("close-toast", toastClosed);
-function toastClosed() {
-  toast.setAttribute("is-active", "false");
-}
-
-window.addEventListener("toggle-toast", toggleToast);
-function toggleToast(e) {
-  showToast(e.detail.messages, e.detail.type, e.detail.fixed)
-  toast.setAttribute("is-active", "true");
-}
-
-const ebc = document.querySelector("custom-ebc");
-
-function setAttributes(el, attrs) {
-  for (var key in attrs) {
-    const attr =
-      typeof attrs[key] !== "string"
-        ? JSON.stringify(attrs[key])
-        : attrs[key];
-    el.setAttribute(key, attr);
+  const logout = {
+    url: "${link.getAction('/taxfreenoncashbenefit/logout')}",
+    msg: "$!{messages.get('shop.ebc.<MESSAGE FOR LOGOUT>')}"
   }
-}
-
-const ebcProps = {
-  translations: {
-    #foreach($resource in ${messages.getResourcesWithPrefix('shop.ebc.my_account')})
-      '$!{resource.getKey()}': '$!{resource.getValue().replace("'", "")}',
-    #end
-  },
-  user: document.querySelector('.site-title').innerText,
-  "primary-color": getComputedStyle(document.querySelector('.site-title')).color,
-  "hover-color": getComputedStyle(document.querySelector('.hover-color')).color,
-  font: getComputedStyle(document.querySelector('.site-title')).fontFamily,
-  "email-url": "${link.getAction('/ajax/taxfreenoncashbenefit/email')}",
-  "no-email-url": "${link.getAction('/ajax/taxfreenoncashbenefit/email/login')}",
-  "credential-url": "${link.getAction('/ajax/taxfreenoncashbenefit/credential')}",
-  "logout": "${link.getAction("/taxfreenoncashbenefit/logout")}"
-};
-setAttributes(ebc, ebcProps);
+  function showToast(msg, type, fixed = false) {
+    td.message = JSON.parse(JSON.stringify(msg))
+    td.title = messages[type]
+    td.type = type
+    toast.setAttribute("toast-data", JSON.stringify(td));
+    if(fixed) {
+      toast.setAttribute("fixed", JSON.stringify(fixed))
+      toast.setAttribute("action-url", JSON.stringify(logout.url))
+      toast.setAttribute("action-title", JSON.stringify(logout.msg))
+    }
+    toast.setAttribute("is-active", "true");
+  }
+  window.addEventListener("close-toast", toastClosed);
+  function toastClosed() {
+    toast.setAttribute("is-active", "false");
+  }
+  // vue3 web component ebc handling
+  const ebc = document.querySelector("custom-ebc");
+  function setAttributes(el, attrs) {
+    for (var key in attrs) {
+      const attr =
+        typeof attrs[key] !== "string"
+          ? JSON.stringify(attrs[key])
+          : attrs[key];
+      el.setAttribute(key, attr);
+    }
+  }
+  const ebcProps = {
+    translations: {
+      #foreach($resource in ${messages.getResourcesWithPrefix('shop.ebc.my_account')})
+        '$!{resource.getKey()}': '$!{resource.getValue().replace("'", "")}',
+      #end
+    },
+    "primary-color": getComputedStyle(document.querySelector('.site-title')).color,
+    "hover-color": getComputedStyle(document.querySelector('.hover-color')).color,
+    font: getComputedStyle(document.querySelector('.site-title')).fontFamily,
+    "action-url": "${link.getAction('/ajax/taxfreenoncashbenefit/email')}"
+  };
+  setAttributes(ebc, ebcProps);
+  window.addEventListener("toggle-toast", toggleToast);
+  function toggleToast(e) {
+    showToast(e.detail.messages, e.detail.type, e.detail.fixed)
+  }
 </script>

@@ -233,9 +233,12 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, watch, onMounted } from "vue";
+import { ref, computed, reactive, onMounted } from "vue";
 import { useFetch } from "../composables/useFetch";
 import { useDetectOutsideClick } from "../composables/useDetectOutsideClick";
+import { resolveUrl } from "../utils/resolveUrl";
+import { prepareFormData } from "../utils/prepareFormData";
+import { clearObjectValues } from "../utils/utils";
 
 // setting props
 const props = defineProps({
@@ -254,22 +257,17 @@ const props = defineProps({
     type: String,
     default: "",
   },
-  user: {
+  actionUrl: {
     type: String,
-  },
-  emailUrl: {
-    type: String,
-  },
-  noEmailUrl: {
-    type: String,
-  },
-  credentialUrl: {
-    type: String,
-  },
-  logout: {
-    type: String,
+    default: "",
   },
 });
+// actions paths
+const urls = {
+  email: "email",
+  noEmail: "email/login",
+  credential: "credential",
+};
 // seting template elements states
 const toogleFieldType = (i) => {
   fieldsInfo[i].fieldType =
@@ -295,6 +293,12 @@ const showEmail = computed(() => {
     receivedData.value.deliveryAddress ||
     receivedData.value.emailAddress ||
     translate("no_email")
+  );
+});
+const isAditionalEmail = computed(() => {
+  return (
+    (isEmail.value || receivedData.value.additionalDeliveryAddress) &&
+    receivedData.value.deliveryAddress
   );
 });
 // return translations by keys
@@ -326,17 +330,10 @@ useDetectOutsideClick(passRef, () => {
 useDetectOutsideClick(emailRef, () => {
   isEmail.value = false;
 });
-
+// load user data
 onMounted(async () => {
   await getUserData();
   console.log(receivedData.value);
-});
-
-const isAditionalEmail = computed(() => {
-  return (
-    (isEmail.value || receivedData.value.additionalDeliveryAddress) &&
-    receivedData.value.deliveryAddress
-  );
 });
 // fields inputs
 const passwords = reactive({
@@ -366,33 +363,15 @@ const handleFieldErrors = (err) => {
 };
 const handleGeneralError = (err) => {
   const generalError = err.find((e) => e.errorType === "error");
-  if (generalError) showToast(generalError.errorMessage);
+  if (generalError) showToast(generalError.errorMessage, 'error');
 };
-const clearFieldErrors = () => {
-  Object.keys(errors).forEach((key) => {
-    errors[key] = null;
-  });
-};
-// prepare data for ajax end-points calls
-const prepareFormData = (action, fields = null, isPassword = false) => {
-  const formData = new FormData();
-  const bean = isPassword ? "employeeChangePasswordBean." : "";
-  formData.append("action", action);
-  if (fields) {
-    for (const [key, value] of Object.entries(fields)) {
-      formData.append(bean + key, value);
-    }
-    return new URLSearchParams(formData);
-  }
-  return formData;
-};
-// fetch user data
+// fetch user data credentials & emails
 const receivedData = ref({});
 const isEmailMandatory = ref(null);
 const emailUrl = ref(null);
 const getUserData = async () => {
   const userData = await useFetch(
-    props.credentialUrl,
+    resolveUrl(props.actionUrl, urls.credential),
     "POST",
     prepareFormData("edit")
   );
@@ -400,7 +379,9 @@ const getUserData = async () => {
     ? handleGeneralError(userData.error)
     : (isEmailMandatory.value = userData.emailMandatory);
 
-  emailUrl.value = isEmailMandatory.value ? props.emailUrl : props.noEmailUrl;
+  emailUrl.value = isEmailMandatory.value
+    ? resolveUrl(props.actionUrl, urls.email)
+    : resolveUrl(props.actionUrl, urls.noEmail);
   const emailData = await useFetch(
     emailUrl.value,
     "POST",
@@ -410,6 +391,7 @@ const getUserData = async () => {
     ? handleGeneralError(emailData.error)
     : (receivedData.value = emailData);
 };
+// handle email type
 const emailAddress = computed({
   get() {
     return isEmailMandatory.value
@@ -424,24 +406,24 @@ const emailAddress = computed({
     }
   },
 });
-// define email type
+// define email type (email or aditional email)
 const getEmailKey = (value) => {
   return Object.keys(emails).find((k) => emails[k] === value);
 };
 // handle forms states
 const isPass = ref(null);
 const isEmail = ref(null);
-const togglePass = async () => {
+const togglePass = () => {
   isPass.value = !isPass.value;
-  clearFieldErrors();
+  clearObjectValues(errors);
 };
-const toggleEmail = async () => {
+const toggleEmail = () => {
   isEmail.value = !isEmail.value;
 };
-// save data end-points calls
+// end-points calls for saving/deleting data
 const savePassword = async () => {
   const received = await useFetch(
-    props.credentialUrl,
+    resolveUrl(props.actionUrl, urls.credential),
     "POST",
     prepareFormData("save", passwords, true)
   );
@@ -449,10 +431,8 @@ const savePassword = async () => {
     handleFieldErrors(received.error);
     console.log("pass errors", received);
   } else {
-    showToast(translate("save.success"), false, true);
-    Object.keys(passwords).forEach((key) => {
-      passwords[key] = null;
-    });
+    showToast(translate("save.success"), 'success', true);
+    clearObjectValues(passwords);
     isPass.value = false;
   }
 };
@@ -468,7 +448,7 @@ const saveAddress = async () => {
     handleGeneralError(received.error);
     console.log("email errors", received);
   } else {
-    showToast(translate("save.success"), false);
+    showToast(translate("save.success"), 'success');
     getUserData();
     emailAddress.value = null;
     isEmail.value = false;
@@ -484,33 +464,21 @@ const deleteAddress = async () => {
     handleGeneralError(received.error);
     console.log("delete email error", received);
   } else {
-    showToast(translate("delete.success"), false);
+    showToast(translate("delete.success"), 'success');
     getUserData();
     emails.additionalDeliveryEmailAddress = null;
     isEmail.value = false;
   }
 };
-// // setting component state
-// const active = ref(false);
-// watch(
-//   () => props.isActive,
-//   (newValue) => {
-//     active.value = newValue === 'true';
-//     if (active.value) {
-//       !receivedData.value.length && getData();
-//       search.value.focus();
-//     }
-//   }
-// );
 // creating & emitting event for showing toast
 const emit = defineEmits(["toggle-toast"]);
 const accountWrapper = ref(null);
-const showToast = (msg, type = true, fixed = false) => {
+const showToast = (messages, type, fixed = false) => {
   accountWrapper.value.dispatchEvent(
     new CustomEvent("toggle-toast", {
       bubbles: true,
       composed: true,
-      detail: { messages: msg, type: type, fixed },
+      detail: { messages, type, fixed },
     })
   );
 };

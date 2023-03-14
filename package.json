@@ -1,6 +1,6 @@
 {
   "name": "search-web-component",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "author": "Nikola Pavicevic <nijepa@gmail.com>",
   "description": "Vue3 web-component ebc with Vite",
   "keywords": [
