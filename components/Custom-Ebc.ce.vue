@@ -13,7 +13,7 @@
                 <h4 class="overview-title" @click="togglePass">
                   {{ translate("access-data") }}
                 </h4>
-                <button @click="togglePass" class="edit-btn">
+                <button @click="togglePass" v-if="isEmailMandatory" class="edit-btn">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -32,7 +32,8 @@
                   </svg>
                 </button>
               </div>
-              <form id="password-form" @submit.prevent="savePassword">
+              <div v-if="!isEmailMandatory" class="loading-spinner"></div>
+              <form v-else id="password-form" @submit.prevent="savePassword">
                 <div class="row my-3">
                   <div class="col-12 col-lg-4 font-weight-bold">
                     {{ translate("user-name") }}
@@ -134,7 +135,7 @@
                 <h4 class="overview-title">
                   {{ translate("delivery-address") }}
                 </h4>
-                <button @click="toggleEmail" class="edit-btn">
+                <button @click="toggleEmail" v-if="receivedData.emailAddress || receivedData.deliveryAddress" class="edit-btn">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -153,7 +154,8 @@
                   </svg>
                 </button>
               </div>
-              <form id="address-form" @submit.prevent="saveAddress">
+              <div v-if="!receivedData.emailAddress && !receivedData.deliveryAddress" class="loading-spinner"></div>
+              <form v-else id="address-form" @submit.prevent="saveAddress">
                 <div class="row my-3">
                   <div class="col-12 col-lg-4 font-weight-bold">
                     {{ translate("email") }}
@@ -333,7 +335,6 @@ useDetectOutsideClick(emailRef, () => {
 // load user data
 onMounted(async () => {
   await getUserData();
-  console.log(receivedData.value);
 });
 // fields inputs
 const passwords = reactive({
@@ -831,5 +832,30 @@ svg {
 .slide-up-leave-to {
   opacity: 0;
   transform: translateY(-20px);
+}
+.loading-spinner {
+  display: block;
+  width: 80px;
+  height: 80px;
+  margin: 3rem auto;
+}
+.loading-spinner:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6px solid #fff;
+  border-color: v-bind(props.primaryColor) transparent v-bind(props.primaryColor) transparent;
+  animation: loading-spinner 1.2s linear infinite;
+}
+@keyframes loading-spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>
