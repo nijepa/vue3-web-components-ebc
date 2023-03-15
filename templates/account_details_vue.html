@@ -15,7 +15,7 @@
   }
   const logout = {
     url: "${link.getAction('/taxfreenoncashbenefit/logout')}",
-    msg: "$!{messages.get('shop.ebc.<MESSAGE FOR LOGOUT>')}"
+    msg: "$!{messages.get('shop.ebc.login.logged_out')}"
   }
   function showToast(msg, type, fixed = false) {
     td.message = JSON.parse(JSON.stringify(msg))

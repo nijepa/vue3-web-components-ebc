@@ -2,18 +2,22 @@
   <section class="stage" ref="accountWrapper">
     <div class="stage__container">
       <h2 class="my-4" :style="{ color: primaryColor }">
-        {{ translate("title") }}
+        {{ translate('title') }}
       </h2>
-      <p class="card-text">{{ translate("text") }}</p>
+      <p class="card-text">{{ translate('text') }}</p>
       <div class="row">
         <div class="col-sm-12 col-md-6 mb-3" ref="passRef">
           <div class="card stage__card voucher-overview">
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <h4 class="overview-title" @click="togglePass">
-                  {{ translate("access-data") }}
+                  {{ translate('access-data') }}
                 </h4>
-                <button @click="togglePass" v-if="isEmailMandatory" class="edit-btn">
+                <button
+                  @click="togglePass"
+                  v-if="isEmailMandatory"
+                  class="edit-btn"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -36,7 +40,7 @@
               <form v-else id="password-form" @submit.prevent="savePassword">
                 <div class="row my-3">
                   <div class="col-12 col-lg-4 font-weight-bold">
-                    {{ translate("user-name") }}
+                    {{ translate('user-name') }}
                   </div>
                   <div class="col-12 col-lg-8">
                     {{ receivedData?.username }}
@@ -44,7 +48,7 @@
                 </div>
                 <div class="row my-3">
                   <div class="col-12 col-lg-4 font-weight-bold mt-3">
-                    {{ translate("password") }}
+                    {{ translate('password') }}
                   </div>
                   <div class="col-12 col-lg-8 mt-3">
                     <Transition name="slide-up" mode="out-in">
@@ -118,7 +122,7 @@
                           class="btn btn-primary account-data mb-3 disabled"
                           type="submit"
                         >
-                          {{ translate("save_changes") }}
+                          {{ translate('save_changes') }}
                         </button>
                       </div>
                     </Transition>
@@ -133,9 +137,15 @@
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <h4 class="overview-title">
-                  {{ translate("delivery-address") }}
+                  {{ translate('delivery-address') }}
                 </h4>
-                <button @click="toggleEmail" v-if="receivedData.emailAddress || receivedData.deliveryAddress" class="edit-btn">
+                <button
+                  @click="toggleEmail"
+                  v-if="
+                    receivedData.emailAddress || receivedData.deliveryAddress
+                  "
+                  class="edit-btn"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -154,11 +164,16 @@
                   </svg>
                 </button>
               </div>
-              <div v-if="!receivedData.emailAddress && !receivedData.deliveryAddress" class="loading-spinner"></div>
+              <div
+                v-if="
+                  !receivedData.emailAddress && !receivedData.deliveryAddress
+                "
+                class="loading-spinner"
+              ></div>
               <form v-else id="address-form" @submit.prevent="saveAddress">
                 <div class="row my-3">
                   <div class="col-12 col-lg-4 font-weight-bold">
-                    {{ translate("email") }}
+                    {{ translate('email') }}
                   </div>
                   <div
                     class="col-12 col-lg-8"
@@ -179,7 +194,7 @@
                       class="col-12 col-lg-4 font-weight-bold additional-email mt-3"
                       v-if="isAditionalEmail"
                     >
-                      {{ translate("alternative_email") }}
+                      {{ translate('alternative_email') }}
                     </div>
                     <div
                       class="col-12 col-lg-4 font-weight-bold additional-email mt-3"
@@ -235,12 +250,12 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, onMounted } from "vue";
-import { useFetch } from "../composables/useFetch";
-import { useDetectOutsideClick } from "../composables/useDetectOutsideClick";
-import { resolveUrl } from "../utils/resolveUrl";
-import { prepareFormData } from "../utils/prepareFormData";
-import { clearObjectValues } from "../utils/utils";
+import { ref, computed, reactive, onMounted } from 'vue';
+import { useFetch } from '../composables/useFetch';
+import { useDetectOutsideClick } from '../composables/useDetectOutsideClick';
+import { resolveUrl } from '../utils/resolveUrl';
+import { prepareFormData } from '../utils/prepareFormData';
+import { clearObjectValues } from '../utils/utils';
 
 // setting props
 const props = defineProps({
@@ -249,41 +264,44 @@ const props = defineProps({
   },
   primaryColor: {
     type: String,
-    default: "#fff",
+    default: '#fff',
   },
   hoverColor: {
     type: String,
-    default: "#660000",
+    default: '#660000',
   },
   font: {
     type: String,
-    default: "",
+    default: '',
   },
   actionUrl: {
     type: String,
-    default: "",
+    default: '',
   },
 });
 // actions paths
 const urls = {
-  email: "email",
-  noEmail: "email/login",
-  credential: "credential",
+  email: 'email',
+  noEmail: 'email/login',
+  credential: 'credential',
 };
 // seting template elements states
 const toogleFieldType = (i) => {
   fieldsInfo[i].fieldType =
-    fieldsInfo[i].fieldType === "password" ? "text" : "password";
+    fieldsInfo[i].fieldType === 'password' ? 'text' : 'password';
+};
+const resetFieldType = () => {
+  fieldsInfo.forEach((f) => (f.fieldType = 'password'));
 };
 const getButtonText = (type = false) => {
   if (type) {
     return isEmailMandatory.value
-      ? translate("send_to_alternative_email")
-      : translate("save_email");
+      ? translate('send_to_alternative_email')
+      : translate('save_email');
   }
   return isEmailMandatory.value
-    ? translate("delete_alternative_email")
-    : translate("delete_email");
+    ? translate('delete_alternative_email')
+    : translate('delete_email');
 };
 const hasDeleteButton = computed(() => {
   return isEmailMandatory.value
@@ -294,7 +312,7 @@ const showEmail = computed(() => {
   return (
     receivedData.value.deliveryAddress ||
     receivedData.value.emailAddress ||
-    translate("no_email")
+    translate('no_email')
   );
 });
 const isAditionalEmail = computed(() => {
@@ -304,23 +322,23 @@ const isAditionalEmail = computed(() => {
   );
 });
 // return translations by keys
-const prefix = "shop.ebc.my_account.";
+const prefix = 'shop.ebc.my_account.';
 const translate = (key) => {
   return JSON.parse(props.translations)[prefix + key];
 };
 // define fields types/translations
 const fieldsInfo = reactive([
   {
-    fieldType: "password",
-    placeholder: translate("old_password"),
+    fieldType: 'password',
+    placeholder: translate('old_password'),
   },
   {
-    fieldType: "password",
-    placeholder: translate("new_password"),
+    fieldType: 'password',
+    placeholder: translate('new_password'),
   },
   {
-    fieldType: "password",
-    placeholder: translate("repeat_new_password"),
+    fieldType: 'password',
+    placeholder: translate('repeat_new_password'),
   },
 ]);
 // handle click outside
@@ -328,13 +346,14 @@ const passRef = ref();
 const emailRef = ref();
 useDetectOutsideClick(passRef, () => {
   isPass.value = false;
+  resetFieldType();
 });
 useDetectOutsideClick(emailRef, () => {
   isEmail.value = false;
 });
 // load user data
 onMounted(async () => {
-  await getUserData();
+  await getUserData()
 });
 // fields inputs
 const passwords = reactive({
@@ -354,7 +373,7 @@ const errors = reactive({
 });
 const handleFieldErrors = (err) => {
   const fieldErrors = err.filter((e) => {
-    return e.errorType === "FieldError";
+    return e.errorType === 'FieldError';
   });
   if (fieldErrors.length) {
     fieldErrors.forEach((f) => {
@@ -363,7 +382,7 @@ const handleFieldErrors = (err) => {
   }
 };
 const handleGeneralError = (err) => {
-  const generalError = err.find((e) => e.errorType === "error");
+  const generalError = err.find((e) => e.errorType === 'error');
   if (generalError) showToast(generalError.errorMessage, 'error');
 };
 // fetch user data credentials & emails
@@ -373,8 +392,8 @@ const emailUrl = ref(null);
 const getUserData = async () => {
   const userData = await useFetch(
     resolveUrl(props.actionUrl, urls.credential),
-    "POST",
-    prepareFormData("edit")
+    'POST',
+    prepareFormData('edit')
   );
   userData.error.length
     ? handleGeneralError(userData.error)
@@ -385,8 +404,8 @@ const getUserData = async () => {
     : resolveUrl(props.actionUrl, urls.noEmail);
   const emailData = await useFetch(
     emailUrl.value,
-    "POST",
-    prepareFormData("edit")
+    'POST',
+    prepareFormData('edit')
   );
   emailData.error.length
     ? handleGeneralError(emailData.error)
@@ -425,14 +444,14 @@ const toggleEmail = () => {
 const savePassword = async () => {
   const received = await useFetch(
     resolveUrl(props.actionUrl, urls.credential),
-    "POST",
-    prepareFormData("save", passwords, true)
+    'POST',
+    prepareFormData('save', passwords, true)
   );
   if (received.error.length) {
     handleFieldErrors(received.error);
-    console.log("pass errors", received);
+    console.log('pass errors', received);
   } else {
-    showToast(translate("save.success"), 'success', true);
+    showToast(translate('save.success'), 'success', true);
     clearObjectValues(passwords);
     isPass.value = false;
   }
@@ -440,16 +459,16 @@ const savePassword = async () => {
 const saveAddress = async () => {
   const received = await useFetch(
     emailUrl.value,
-    "POST",
-    prepareFormData("save", {
+    'POST',
+    prepareFormData('save', {
       [getEmailKey(emailAddress.value)]: emailAddress.value,
     })
   );
   if (received.error.length) {
     handleGeneralError(received.error);
-    console.log("email errors", received);
+    console.log('email errors', received);
   } else {
-    showToast(translate("save.success"), 'success');
+    showToast(translate('save.success'), 'success');
     getUserData();
     emailAddress.value = null;
     isEmail.value = false;
@@ -458,25 +477,25 @@ const saveAddress = async () => {
 const deleteAddress = async () => {
   const received = await useFetch(
     emailUrl.value,
-    "POST",
-    prepareFormData("delete")
+    'POST',
+    prepareFormData('delete')
   );
   if (received.error.length) {
     handleGeneralError(received.error);
-    console.log("delete email error", received);
+    console.log('delete email error', received);
   } else {
-    showToast(translate("delete.success"), 'success');
+    showToast(translate('delete.success'), 'success');
     getUserData();
     emails.additionalDeliveryEmailAddress = null;
     isEmail.value = false;
   }
 };
 // creating & emitting event for showing toast
-const emit = defineEmits(["toggle-toast"]);
+const emit = defineEmits(['toggle-toast']);
 const accountWrapper = ref(null);
 const showToast = (messages, type, fixed = false) => {
   accountWrapper.value.dispatchEvent(
-    new CustomEvent("toggle-toast", {
+    new CustomEvent('toggle-toast', {
       bubbles: true,
       composed: true,
       detail: { messages, type, fixed },
@@ -488,16 +507,19 @@ const showToast = (messages, type, fixed = false) => {
 * {
   scroll-margin-top: 150px;
 }
+
 *,
 ::after,
 ::before {
   box-sizing: border-box;
 }
+
 .stage {
   padding-bottom: 1.5rem;
   font-family: v-bind(props.font);
   display: flex;
 }
+
 .stage__container {
   position: relative;
   width: 100%;
@@ -506,13 +528,16 @@ const showToast = (messages, type, fixed = false) => {
   margin-right: auto;
   margin-left: auto;
 }
+
 .account-data,
 .address-data {
   width: 100%;
 }
+
 .form-control {
   height: 3rem;
 }
+
 .form-control {
   display: block;
   width: 100%;
@@ -528,6 +553,7 @@ const showToast = (messages, type, fixed = false) => {
   border-radius: 0.25rem;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
+
 .form-control.is-invalid,
 .was-validated .form-control:invalid {
   border-color: #dc3545;
@@ -537,55 +563,67 @@ const showToast = (messages, type, fixed = false) => {
   background-position: right calc(0.375em + 0.1875rem) center;
   background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
 }
+
 .form-control.is-invalid:focus,
 .was-validated .form-control:invalid:focus {
   border-color: #dc3545;
   box-shadow: 0 0 0 0.2rem rgb(220 53 69 / 25%);
 }
-[type="button"]:not(:disabled),
-[type="reset"]:not(:disabled),
-[type="submit"]:not(:disabled),
+
+[type='button']:not(:disabled),
+[type='reset']:not(:disabled),
+[type='submit']:not(:disabled),
 button:not(:disabled) {
   cursor: pointer;
 }
+
 .edit-btn {
   background: transparent;
   color: v-bind(props.primaryColor);
   border: none;
   padding: 0 !important;
 }
+
 .mb-3,
 .my-3 {
   margin-bottom: 1rem !important;
 }
+
 .mb-4,
 .my-4 {
   margin-bottom: 1.5rem !important;
 }
+
 .mt-4,
 .my-4 {
   margin-top: 1.5rem !important;
 }
+
 .mt-3,
 .my-3 {
   margin-top: 1rem !important;
 }
+
 h2 {
   font-size: 1.75rem;
   line-height: 1.25;
 }
+
 h4 {
   font-size: 1.1875rem;
   line-height: 1.25;
 }
+
 h4 {
   font-size: 1.5rem;
 }
+
 h2,
 h4 {
   font-weight: 500;
   line-height: 1.2;
 }
+
 h2,
 h4 {
   margin-top: 0;
@@ -593,28 +631,35 @@ h4 {
   line-height: 1.25;
   color: v-bind(props.primaryColor);
 }
+
 .row {
   margin-right: -15px;
   margin-left: -15px;
 }
+
 .font-weight-bold {
   font-weight: 700 !important;
 }
+
 .overview-title {
   font-size: 1.75rem;
   color: v-bind(props.primaryColor);
 }
+
 .overview-title {
   text-align: center;
 }
+
 .edit-btn svg {
   width: 1.5rem;
   height: 1.5rem;
 }
+
 svg {
   overflow: hidden;
   vertical-align: middle;
 }
+
 .col,
 .col-12,
 .col-lg-4,
@@ -627,31 +672,37 @@ svg {
   padding-left: 15px;
   float: left;
 }
+
 .col-12 {
   -ms-flex: 0 0 100%;
   flex: 0 0 100%;
   max-width: 100%;
 }
+
 @media (min-width: 992px) {
   .stage {
     padding: 2rem 0 3.5rem;
   }
+
   .col-lg-4 {
     -ms-flex: 0 0 33.333333%;
     flex: 0 0 33.333333%;
     max-width: 33.333333%;
   }
+
   .col-lg-8 {
     -ms-flex: 0 0 66.666667%;
     flex: 0 0 66.666667%;
     max-width: 66.666667%;
   }
 }
+
 @media (min-width: 1200px) {
   .stage__container {
     max-width: 1140px;
   }
 }
+
 @media (min-width: 576px) {
   .col-sm-12 {
     -ms-flex: 0 0 100%;
@@ -659,19 +710,23 @@ svg {
     max-width: 100%;
   }
 }
+
 @media (min-width: 768px) {
   .stage {
     padding: 1.5rem 0 3rem;
   }
+
   .col-md-6 {
     -ms-flex: 0 0 50%;
     flex: 0 0 50%;
     max-width: 50%;
   }
 }
+
 .card {
   border: none;
 }
+
 .card {
   position: relative;
   display: -ms-flexbox;
@@ -685,6 +740,7 @@ svg {
   border: 1px solid rgba(0, 0, 0, 0.125);
   border-radius: 0.25rem;
 }
+
 .stage__card {
   height: 100%;
   background-color: transparent;
@@ -694,6 +750,7 @@ svg {
   border-radius: 0.5rem;
   box-shadow: 0 0.125rem 0.5rem rgb(0 0 0 / 12%);
 }
+
 .stage__card .card-body {
   display: flex;
   flex-direction: column;
@@ -705,14 +762,17 @@ svg {
   flex: 1 1 auto;
   padding: 1.25rem;
 }
+
 .justify-content-between {
   -ms-flex-pack: justify !important;
   justify-content: space-between !important;
 }
+
 .d-flex {
   display: -ms-flexbox !important;
   display: flex !important;
 }
+
 @media (max-width: 576px) {
   .products-list-wrapper,
   .voucher-overview {
@@ -720,6 +780,7 @@ svg {
     box-shadow: none;
   }
 }
+
 .btn {
   display: inline-block;
   font-weight: 400;
@@ -739,28 +800,34 @@ svg {
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
     border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
+
 .btn {
   letter-spacing: -0.015rem;
   padding: 0.75rem;
   font-weight: 600;
   border-radius: 0.5rem;
 }
+
 .btn-primary {
   background-color: v-bind(props.primaryColor);
   color: rgb(255, 255, 255);
   outline: none;
   border: 0;
 }
+
 .account-data,
 .address-data {
   width: 100%;
 }
+
 .no-email {
   margin-top: -1.5rem !important;
 }
+
 .form-control {
   height: 3rem;
 }
+
 .form-control:focus {
   color: #495057;
   background-color: #fff;
@@ -768,6 +835,7 @@ svg {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgb(0 123 255 / 25%);
 }
+
 .btn-primary:hover,
 .btn-primary:active,
 .btn-primary:focus,
@@ -780,10 +848,12 @@ svg {
   box-shadow: none;
   color: rgb(255, 255, 255);
 }
+
 .product-btn {
   border-color: v-bind(props.primaryColor);
   color: v-bind(props.primaryColor);
 }
+
 .product-btn:hover,
 .product-btn:active,
 .product-btn:focus {
@@ -792,68 +862,84 @@ svg {
   box-shadow: 0 0 0 0.2rem #d9d9d9;
   color: white;
 }
+
 .bi:hover {
   fill: v-bind(props.hoverColor);
 }
+
 .text-danger {
   color: #dc3545 !important;
 }
+
 .eye {
   cursor: pointer;
   /* stroke: v-bind(props.primaryColor); */
   /* stroke-width: .2; */
 }
+
 .eye path {
   stroke: v-bind(props.primaryColor);
 }
+
 .eye:hover path {
   stroke: v-bind(props.hoverColor);
 }
+
 .fade-enter-active,
 .fade-leave-active {
   transition: all 0.25s ease;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
 }
+
 .fade-enter-to,
 .fade-leave-from {
   opacity: 1;
 }
+
 .slide-up-enter-active,
 .slide-up-leave-active {
   transition: all 0.25s ease;
 }
+
 .slide-up-enter-from {
   opacity: 0;
   transform: translateY(-20px);
 }
+
 .slide-up-leave-to {
   opacity: 0;
   transform: translateY(-20px);
 }
+
 .loading-spinner {
   display: block;
   width: 80px;
   height: 80px;
   margin: 3rem auto;
 }
+
 .loading-spinner:after {
-  content: " ";
+  content: ' ';
   display: block;
   width: 64px;
   height: 64px;
   margin: 8px;
   border-radius: 50%;
   border: 6px solid #fff;
-  border-color: v-bind(props.primaryColor) transparent v-bind(props.primaryColor) transparent;
+  border-color: v-bind(props.primaryColor) transparent
+    v-bind(props.primaryColor) transparent;
   animation: loading-spinner 1.2s linear infinite;
 }
+
 @keyframes loading-spinner {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
