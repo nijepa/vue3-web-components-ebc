@@ -1,4 +1,4 @@
-# custom-search
+# custom-ebc
 
 ## Vite, Vue3 web-component *`custom-ebc`*
 
