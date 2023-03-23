@@ -43,7 +43,7 @@
                     {{ translate('user-name') }}
                   </div>
                   <div class="col-12 col-lg-8">
-                    {{ receivedData?.username }}
+                    {{ userName }}
                   </div>
                 </div>
                 <div class="row my-3">
@@ -141,9 +141,7 @@
                 </h4>
                 <button
                   @click="toggleEmail"
-                  v-if="
-                    receivedData.emailAddress || receivedData.deliveryAddress
-                  "
+                  v-if="receivedData.deliveryAddress"
                   class="edit-btn"
                 >
                   <svg
@@ -165,9 +163,7 @@
                 </button>
               </div>
               <div
-                v-if="
-                  !receivedData.emailAddress && !receivedData.deliveryAddress
-                "
+                v-if="!receivedData.deliveryAddress"
                 class="loading-spinner"
               ></div>
               <form v-else id="address-form" @submit.prevent="saveAddress">
@@ -179,8 +175,7 @@
                     class="col-12 col-lg-8"
                     v-if="
                       !isEmail ||
-                      receivedData.deliveryAddress ||
-                      receivedData.emailAddress
+                      receivedData.deliveryAddress
                     "
                   >
                     <span id="deliveryAddress">
@@ -216,10 +211,7 @@
                           class="additional-email address-data form-control"
                           type="email"
                           v-model="emailAddress"
-                          :placeholder="
-                            receivedData.additionalDeliveryAddress ||
-                            receivedData.emailAddress
-                          "
+                          :placeholder="receivedData.additionalDeliveryAddress"
                           required
                         />
                         <button
@@ -283,7 +275,8 @@ const props = defineProps({
 const urls = {
   email: 'email',
   noEmail: 'email/login',
-  credential: 'credential',
+  credential: 'account_details',
+  accountDetails: 'account_details'
 };
 // seting template elements states
 const toogleFieldType = (i) => {
@@ -306,12 +299,11 @@ const getButtonText = (type = false) => {
 const hasDeleteButton = computed(() => {
   return isEmailMandatory.value
     ? receivedData.value.additionalDeliveryAddress
-    : receivedData.value.emailAddress;
+    : receivedData.value.deliveryAddress;
 });
 const showEmail = computed(() => {
   return (
     receivedData.value.deliveryAddress ||
-    receivedData.value.emailAddress ||
     translate('no_email')
   );
 });
@@ -363,7 +355,7 @@ const passwords = reactive({
 });
 const emails = reactive({
   additionalDeliveryEmailAddress: null,
-  emailAddress: null,
+  deliveryAddress: null,
 });
 // handle errors
 const errors = reactive({
@@ -389,15 +381,19 @@ const handleGeneralError = (err) => {
 const receivedData = ref({});
 const isEmailMandatory = ref(null);
 const emailUrl = ref(null);
+const userName = ref(null)
 const getUserData = async () => {
   const userData = await useFetch(
-    resolveUrl(props.actionUrl, urls.credential),
+    resolveUrl(props.actionUrl, urls.accountDetails),
     'POST',
-    prepareFormData('edit')
+    prepareFormData('init')
   );
-  userData.error.length
-    ? handleGeneralError(userData.error)
-    : (isEmailMandatory.value = userData.emailMandatory);
+  if (userData.error.length) {
+    handleGeneralError(userData.error)
+  } else {
+    isEmailMandatory.value = userData.emailMandatory
+    userName.value = userData.username
+  }
 
   emailUrl.value = isEmailMandatory.value
     ? resolveUrl(props.actionUrl, urls.email)
@@ -416,13 +412,13 @@ const emailAddress = computed({
   get() {
     return isEmailMandatory.value
       ? emails.additionalDeliveryEmailAddress
-      : emails.emailAddress;
+      : emails.deliveryAddress;
   },
   set(value) {
     if (isEmailMandatory.value) {
       emails.additionalDeliveryEmailAddress = value;
     } else {
-      emails.emailAddress = value;
+      emails.deliveryAddress = value;
     }
   },
 });
@@ -445,7 +441,7 @@ const savePassword = async () => {
   const received = await useFetch(
     resolveUrl(props.actionUrl, urls.credential),
     'POST',
-    prepareFormData('save', passwords, true)
+    prepareFormData('save', passwords, 'employeeChangePasswordBean.')
   );
   if (received.error.length) {
     handleFieldErrors(received.error);
