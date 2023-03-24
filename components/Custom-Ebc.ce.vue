@@ -270,7 +270,7 @@ const props = defineProps({
 });
 // actions paths
 const urls = {
-  email: 'email',
+  email: 'email/delivery_address',
   noEmail: 'email/login',
   credential: 'credential',
   accountDetails: 'account_details',
@@ -348,7 +348,7 @@ const passwords = reactive({
   newPasswordRetype: null,
 });
 const emails = reactive({
-  additionalDeliveryEmailAddress: null,
+  additionalDeliveryAddress: null,
   deliveryAddress: null,
 });
 // handle errors
@@ -371,7 +371,7 @@ const handleGeneralError = (err) => {
   const generalError = err.find((e) => e.errorType === 'error');
   if (generalError) showToast(generalError.errorMessage, 'error');
 };
-// fetch user data credentials & emails
+// fetch data credentials & emails
 const receivedData = ref({});
 const isEmailMandatory = ref(null);
 const emailUrl = ref(null);
@@ -405,12 +405,12 @@ const getUserData = async () => {
 const emailAddress = computed({
   get() {
     return isEmailMandatory.value
-      ? emails.additionalDeliveryEmailAddress
+      ? emails.additionalDeliveryAddress
       : emails.deliveryAddress;
   },
   set(value) {
     if (isEmailMandatory.value) {
-      emails.additionalDeliveryEmailAddress = value;
+      emails.additionalDeliveryAddress = value;
     } else {
       emails.deliveryAddress = value;
     }
@@ -480,7 +480,7 @@ const deleteAddress = async () => {
   } else {
     showToast(translate('delete.success'), 'success');
     getUserData();
-    emails.additionalDeliveryEmailAddress = null;
+    emails.additionalDeliveryAddress = null;
     isEmail.value = false;
   }
 };

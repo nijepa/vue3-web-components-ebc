@@ -1,8 +1,8 @@
 {
   "name": "ebc-web-component",
-  "version": "0.2.5",
+  "version": "0.2.7",
   "author": "Nikola Pavicevic <nijepa@gmail.com>",
-  "description": "Vue3 web-component ebc with Vite",
+  "description": "component for handling account details for ebc",
   "keywords": [
     "Vue3",
     "web-component",
